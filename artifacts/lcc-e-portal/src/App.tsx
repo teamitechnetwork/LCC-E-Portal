@@ -55,6 +55,17 @@ import {
   UserRound,
   WalletCards,
   X,
+  Building2,
+  CalendarClock,
+  ClipboardCheck,
+  Database,
+  FileChartColumn,
+  ListChecks,
+  ScrollText,
+  Settings,
+  SlidersHorizontal,
+  UserCog,
+  Users,
 } from 'lucide-react';
 import { Link, Route, Switch, useLocation, useParams, Router as WouterRouter } from 'wouter';
 import lccLogo from '../../../.conversation/attached_assets/lcc-transparent-logo-bOg0OHhF_1789846258578.png';
@@ -79,14 +90,83 @@ const fallbackUser: User = {
   avatarInitials: 'LC',
 };
 
-const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/courses', label: 'Courses', icon: BookOpen },
-  { href: '/results', label: 'Results', icon: GraduationCap },
-  { href: '/finance', label: 'Finance', icon: WalletCards },
-  { href: '/documents', label: 'Documents', icon: FileText },
-  { href: '/announcements', label: 'Announcements', icon: Bell },
-];
+type PortalRole = User['role'];
+type NavItem = { href: string; label: string; icon: typeof LayoutDashboard };
+
+const roleLabels: Record<PortalRole, string> = {
+  student: 'Student Portal',
+  staff: 'Staff / Faculty Portal',
+  admin: 'Admin Portal',
+  super_admin: 'Super Admin',
+};
+
+const roleDescriptions: Record<PortalRole, string> = {
+  student: 'Your classes, progress, and college life',
+  staff: 'Teaching, attendance, and student records',
+  admin: 'Academic operations and college administration',
+  super_admin: 'Full system control and governance',
+};
+
+const roleNavItems: Record<PortalRole, NavItem[]> = {
+  student: [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/courses', label: 'Course registration', icon: BookOpen },
+    { href: '/student/my-courses', label: 'My courses', icon: ClipboardList },
+    { href: '/student/class-schedule', label: 'Class schedule', icon: CalendarDays },
+    { href: '/results', label: 'Grades / results', icon: GraduationCap },
+    { href: '/student/transcript', label: 'Transcript', icon: FileChartColumn },
+    { href: '/finance', label: 'Fees & payments', icon: WalletCards },
+    { href: '/student/attendance', label: 'Attendance', icon: ClipboardCheck },
+    { href: '/student/assignments', label: 'Assignments', icon: ListChecks },
+    { href: '/announcements', label: 'Announcements', icon: Bell },
+    { href: '/student/notifications', label: 'Notifications', icon: Bell },
+    { href: '/student/profile', label: 'Student profile', icon: UserRound },
+    { href: '/documents', label: 'Download documents', icon: FileText },
+  ],
+  staff: [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/staff/assigned-courses', label: 'Assigned courses', icon: BookOpen },
+    { href: '/staff/class-lists', label: 'Class lists', icon: Users },
+    { href: '/staff/attendance', label: 'Attendance', icon: ClipboardCheck },
+    { href: '/staff/grade-submission', label: 'Grade submission', icon: GraduationCap },
+    { href: '/staff/course-materials', label: 'Course materials', icon: FileText },
+    { href: '/staff/student-records', label: 'Student records', icon: UserRound },
+    { href: '/announcements', label: 'Announcements', icon: Bell },
+  ],
+  admin: [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/students', label: 'Students', icon: Users },
+    { href: '/admin/staff', label: 'Staff', icon: UserRound },
+    { href: '/admin/departments', label: 'Departments', icon: Building2 },
+    { href: '/admin/programs', label: 'Programs', icon: GraduationCap },
+    { href: '/admin/courses', label: 'Courses', icon: BookOpen },
+    { href: '/admin/academic-periods', label: 'Academic years / semesters', icon: CalendarClock },
+    { href: '/admin/registration', label: 'Registration', icon: ClipboardList },
+    { href: '/admin/payments', label: 'Payments', icon: CreditCard },
+    { href: '/admin/results', label: 'Results', icon: FileChartColumn },
+    { href: '/admin/reports', label: 'Reports', icon: TrendingUp },
+    { href: '/announcements', label: 'Announcements', icon: Bell },
+  ],
+  super_admin: [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/students', label: 'Students', icon: Users },
+    { href: '/admin/staff', label: 'Staff', icon: UserRound },
+    { href: '/admin/departments', label: 'Departments', icon: Building2 },
+    { href: '/admin/programs', label: 'Programs', icon: GraduationCap },
+    { href: '/admin/courses', label: 'Courses', icon: BookOpen },
+    { href: '/admin/academic-periods', label: 'Academic years / semesters', icon: CalendarClock },
+    { href: '/admin/registration', label: 'Registration', icon: ClipboardList },
+    { href: '/admin/payments', label: 'Payments', icon: CreditCard },
+    { href: '/admin/results', label: 'Results', icon: FileChartColumn },
+    { href: '/admin/reports', label: 'Reports', icon: TrendingUp },
+    { href: '/super-admin/users', label: 'User / role management', icon: UserCog },
+    { href: '/super-admin/settings', label: 'System settings', icon: Settings },
+    { href: '/super-admin/permissions', label: 'Permissions', icon: SlidersHorizontal },
+    { href: '/super-admin/audit-logs', label: 'Audit logs', icon: ScrollText },
+    { href: '/super-admin/system', label: 'Database / system management', icon: Database },
+    { href: '/announcements', label: 'Announcements', icon: Bell },
+  ],
+};
 
 const formatCurrency = (amount?: number) =>
   typeof amount === 'number'
@@ -165,17 +245,21 @@ function QueryState({
 
 function Sidebar({ user, onLogout, onClose }: { user: User; onLogout: () => void; onClose?: () => void }) {
   const [location] = useLocation();
-  const visibleNavItems = navItems.filter((item) => user.role !== 'staff' || !['Finance', 'Documents'].includes(item.label));
+  const visibleNavItems = roleNavItems[user.role] ?? roleNavItems.student;
   return (
     <aside className="flex h-full w-[264px] shrink-0 flex-col bg-sidebar px-4 py-5 text-sidebar-foreground" data-testid="sidebar">
       <div className="px-3 pb-7"><LogoLockup /></div>
-      <div className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-sidebar-foreground/45">Your academic home</div>
-      <nav className="space-y-1" aria-label="Primary navigation">
+      <div className="mb-4 rounded-xl bg-sidebar-accent/60 px-3 py-3" data-testid="card-role-context">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-primary">{roleLabels[user.role]}</p>
+        <p className="mt-1 text-xs leading-5 text-sidebar-foreground/60">{roleDescriptions[user.role]}</p>
+      </div>
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1" aria-label={`${roleLabels[user.role]} navigation`}>
         {visibleNavItems.map((item) => {
           const active = location === item.href;
-          const Icon = item.icon;
+          const Icon = item.icon ?? LayoutDashboard;
           return (
             <Link
+              key={item.href}
               href={item.href}
               onClick={onClose}
               className={`focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors ${active ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' : 'text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
@@ -183,7 +267,7 @@ function Sidebar({ user, onLogout, onClose }: { user: User; onLogout: () => void
             >
               <Icon className="h-[18px] w-[18px]" />
               <span>{item.label}</span>
-              {item.label === 'Announcements' && <span className="ml-auto h-2 w-2 rounded-full bg-sidebar-primary" aria-label="Unread announcements" data-testid="indicator-unread-announcements" />}
+              {(item.label === 'Announcements' || item.label === 'Notifications') && <span className="ml-auto h-2 w-2 rounded-full bg-sidebar-primary" aria-label="Unread updates" data-testid={`indicator-unread-${item.label.toLowerCase().replaceAll(' ', '-')}`} />}
             </Link>
           );
         })}
@@ -417,6 +501,234 @@ function SupportPage() {
   return <div className="page-in mx-auto max-w-[1000px]" data-testid="page-support"><PageHeading eyebrow="We are here to help" title="Support desk" description="Tell us what is blocking your academic day. The LCC support team will pick it up and keep you posted." /><div className="grid gap-6 lg:grid-cols-[.72fr_1.28fr]"><aside className="rounded-2xl bg-primary p-6 text-primary-foreground shadow-lg sm:p-7"><Headphones className="h-8 w-8 text-accent" /><h2 className="display-font mt-8 text-2xl font-bold">A clear question gets a clear answer.</h2><p className="mt-3 text-sm leading-6 text-primary-foreground/68">For urgent academic deadlines, include the course code or document number in your message.</p><div className="mt-8 space-y-4 border-t border-primary-foreground/15 pt-5 text-sm"><div className="flex gap-3"><TicketCheck className="h-4 w-4 shrink-0 text-accent" /><span>Trackable ticket reference</span></div><div className="flex gap-3"><LockKeyhole className="h-4 w-4 shrink-0 text-accent" /><span>Your details stay within LCC support</span></div></div></aside><section className="rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-7"><div className="mb-6"><p className="eyebrow">New request</p><h2 className="display-font mt-1 text-2xl font-bold">Open a support ticket</h2></div>{submitted && <div className="mb-5 flex items-start gap-3 rounded-xl bg-secondary p-4 text-sm text-secondary-foreground" data-testid="status-ticket-created"><Check className="mt-0.5 h-4 w-4 shrink-0" /><p>Your ticket <span className="mono-font font-bold">{submitted}</span> is open. We will be in touch.</p><button onClick={() => setSubmitted(null)} className="ml-auto" aria-label="Dismiss ticket confirmation" data-testid="button-dismiss-ticket-confirmation"><X className="h-4 w-4" /></button></div>}<form className="space-y-5" onSubmit={submit}><label className="block"><span className="mb-2 block text-sm font-semibold">Subject</span><input required minLength={3} value={form.subject} onChange={(event) => setForm({ ...form, subject: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" placeholder="What do you need help with?" data-testid="input-support-subject" /></label><label className="block"><span className="mb-2 block text-sm font-semibold">Category</span><select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="select-support-category"><option value="academics">Academics</option><option value="finance">Finance</option><option value="account">Account</option><option value="technical">Technical</option><option value="other">Other</option></select></label><label className="block"><span className="mb-2 block text-sm font-semibold">Message</span><textarea required minLength={5} value={form.message} onChange={(event) => setForm({ ...form, message: event.target.value })} rows={5} className="w-full resize-y rounded-xl border border-input bg-background px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" placeholder="Include the useful details so we can help faster." data-testid="textarea-support-message" /></label>{createTicket.error && <p className="text-sm font-medium text-destructive" data-testid="status-support-error">That ticket could not be submitted. Please try again.</p>}<button disabled={createTicket.isPending} className="focus-ring inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-60" data-testid="button-submit-support-ticket">{createTicket.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4" /> Send to support</>}</button></form></section></div></div>;
 }
 
+type FeatureDefinition = {
+  title: string;
+  eyebrow: string;
+  description: string;
+  icon: NavItem['icon'];
+  summary: string;
+  rows: Array<{ label: string; value: string; detail: string }>;
+};
+
+const roleFeatureCatalog: Record<PortalRole, Record<string, FeatureDefinition>> = {
+  student: {
+    'my-courses': {
+      title: 'My courses',
+      eyebrow: 'Student academics',
+      description: 'Your registered courses, instructors, credits, and current semester commitments.',
+      icon: BookOpen,
+      summary: 'Fall 2026 registered load',
+      rows: [
+        { label: 'Registered courses', value: '4', detail: 'Your active course list' },
+        { label: 'Credit load', value: '11', detail: 'Credits this semester' },
+        { label: 'Next class', value: '10:00 AM', detail: 'CSC 301 · Science 204' },
+      ],
+    },
+    'class-schedule': {
+      title: 'Class schedule',
+      eyebrow: 'Student academics',
+      description: 'Keep every class, room, and meeting time in view throughout the semester.',
+      icon: CalendarDays,
+      summary: 'This week at Monrovia campus',
+      rows: [
+        { label: 'Monday', value: 'CSC 301', detail: '10:00 AM · Science 204' },
+        { label: 'Tuesday', value: 'BIB 220', detail: '8:00 AM · Faith Hall 102' },
+        { label: 'Friday', value: 'ENG 210', detail: '9:00 AM · Humanities 201' },
+      ],
+    },
+    transcript: {
+      title: 'Transcript',
+      eyebrow: 'Student records',
+      description: 'Review your academic history and prepare an official record when you need one.',
+      icon: FileChartColumn,
+      summary: 'Academic record',
+      rows: [
+        { label: 'Cumulative average', value: '3.68', detail: 'Current GPA' },
+        { label: 'Completed credits', value: '42', detail: 'Across completed semesters' },
+        { label: 'Record status', value: 'Current', detail: 'No holds reported' },
+      ],
+    },
+    attendance: {
+      title: 'Attendance',
+      eyebrow: 'Student progress',
+      description: 'See your attendance standing and follow up before missed classes affect your progress.',
+      icon: ClipboardCheck,
+      summary: 'Excellent standing',
+      rows: [
+        { label: 'Overall attendance', value: '94%', detail: 'Across registered courses' },
+        { label: 'Classes attended', value: '47', detail: 'This semester' },
+        { label: 'Follow-up needed', value: '1', detail: 'Review with your instructor' },
+      ],
+    },
+    assignments: {
+      title: 'Assignments',
+      eyebrow: 'Student work',
+      description: 'Track upcoming coursework and the next deadlines across your registered classes.',
+      icon: ListChecks,
+      summary: 'Keep your deadlines visible',
+      rows: [
+        { label: 'Open assignments', value: '12', detail: 'Across your courses' },
+        { label: 'Due this week', value: '3', detail: 'Plan time before Friday' },
+        { label: 'Submitted', value: '18', detail: 'Fall 2026 activity' },
+      ],
+    },
+    notifications: {
+      title: 'Notifications',
+      eyebrow: 'Student updates',
+      description: 'Important reminders from academics, finance, and the LCC community.',
+      icon: Bell,
+      summary: 'Recent updates',
+      rows: [
+        { label: 'Registration', value: 'Action needed', detail: 'Closes Friday at 5:00 PM' },
+        { label: 'Finance', value: 'Reminder', detail: 'Payment plan support is available' },
+        { label: 'Campus', value: 'New', detail: 'Founders Week chapel on Wednesday' },
+      ],
+    },
+    profile: {
+      title: 'Student profile',
+      eyebrow: 'Account details',
+      description: 'Keep your identity and contact details ready for academic and administrative services.',
+      icon: UserRound,
+      summary: 'Your LCC identity',
+      rows: [
+        { label: 'Name', value: 'Morris Doe', detail: 'Student account holder' },
+        { label: 'Student ID', value: 'LCC-2024-0187', detail: 'Use this for college services' },
+        { label: 'Campus', value: 'Monrovia', detail: 'Liberia Christian College' },
+      ],
+    },
+  },
+  staff: {
+    'assigned-courses': {
+      title: 'Assigned courses',
+      eyebrow: 'Faculty workspace',
+      description: 'Manage the courses assigned to you and stay close to the semester teaching plan.',
+      icon: BookOpen,
+      summary: 'Fall 2026 teaching load',
+      rows: [
+        { label: 'Assigned courses', value: '4', detail: 'Active this semester' },
+        { label: 'Students total', value: '138', detail: 'Across your classes' },
+        { label: 'Next class', value: '10:00 AM', detail: 'CSC 301 · Science 204' },
+      ],
+    },
+    'class-lists': {
+      title: 'Class lists',
+      eyebrow: 'Faculty workspace',
+      description: 'Open the current roster for each assigned course and quickly identify your learners.',
+      icon: Users,
+      summary: 'Roster overview',
+      rows: [
+        { label: 'Active rosters', value: '4', detail: 'One per assigned course' },
+        { label: 'Largest class', value: '42', detail: 'CSC 301' },
+        { label: 'New students', value: '6', detail: 'Added this semester' },
+      ],
+    },
+    attendance: {
+      title: 'Attendance',
+      eyebrow: 'Faculty workspace',
+      description: 'Record attendance and review students who may need an early check-in.',
+      icon: ClipboardCheck,
+      summary: 'Attendance to review',
+      rows: [
+        { label: 'Sessions this week', value: '12', detail: 'Across your courses' },
+        { label: 'Needs attention', value: '3', detail: 'Students below 80%' },
+        { label: 'Last submission', value: 'Today', detail: 'CSC 301 · 10:00 AM' },
+      ],
+    },
+    'grade-submission': {
+      title: 'Grade submission',
+      eyebrow: 'Faculty workspace',
+      description: 'Prepare, review, and submit marks for the courses assigned to you.',
+      icon: GraduationCap,
+      summary: 'Fall 2026 grading',
+      rows: [
+        { label: 'Open gradebooks', value: '4', detail: 'One per assigned course' },
+        { label: 'Submission window', value: 'Oct 1', detail: 'Next deadline' },
+        { label: 'Awaiting review', value: '12', detail: 'Assignments across classes' },
+      ],
+    },
+    'course-materials': {
+      title: 'Course materials',
+      eyebrow: 'Faculty workspace',
+      description: 'Organize the learning resources your classes need for the current semester.',
+      icon: FileText,
+      summary: 'Teaching resources',
+      rows: [
+        { label: 'Course folders', value: '4', detail: 'One per assigned course' },
+        { label: 'Published materials', value: '28', detail: 'Visible to students' },
+        { label: 'Draft uploads', value: '3', detail: 'Ready to review' },
+      ],
+    },
+    'student-records': {
+      title: 'Student records',
+      eyebrow: 'Faculty workspace',
+      description: 'Find the academic context you need to support students in your assigned classes.',
+      icon: UserRound,
+      summary: 'Teaching support',
+      rows: [
+        { label: 'Students in scope', value: '138', detail: 'Only your assigned classes' },
+        { label: 'At-risk records', value: '8', detail: 'Attendance or grade signals' },
+        { label: 'Recent updates', value: '14', detail: 'Since your last visit' },
+      ],
+    },
+  },
+  admin: {
+    students: { title: 'Students', eyebrow: 'Administration', description: 'Manage student records, identifiers, enrollment status, and academic standing.', icon: Users, summary: 'Student administration', rows: [{ label: 'Total students', value: '1,248', detail: 'Across active programs' }, { label: 'New this year', value: '342', detail: 'Applications and admissions' }, { label: 'Needs review', value: '28', detail: 'Awaiting administrative action' }] },
+    staff: { title: 'Staff', eyebrow: 'Administration', description: 'Maintain staff and faculty records across departments and teaching assignments.', icon: UserRound, summary: 'Staff administration', rows: [{ label: 'Active staff', value: '86', detail: 'Across 6 departments' }, { label: 'Faculty', value: '64', detail: 'Teaching and academic staff' }, { label: 'Pending profiles', value: '4', detail: 'Require review' }] },
+    departments: { title: 'Departments', eyebrow: 'Academic structure', description: 'Organize the academic departments that own programs, courses, and faculty assignments.', icon: Building2, summary: 'Academic organization', rows: [{ label: 'Departments', value: '6', detail: 'Active academic units' }, { label: 'Programs', value: '18', detail: 'Owned by departments' }, { label: 'Heads to review', value: '1', detail: 'Annual confirmation' }] },
+    programs: { title: 'Programs', eyebrow: 'Academic structure', description: 'Manage degree and certificate programs, requirements, and department ownership.', icon: GraduationCap, summary: 'Program catalog', rows: [{ label: 'Active programs', value: '18', detail: 'Published to students' }, { label: 'Program reviews', value: '3', detail: 'Due this academic year' }, { label: 'Departments', value: '6', detail: 'Program owners' }] },
+    courses: { title: 'Courses', eyebrow: 'Academic structure', description: 'Maintain course codes, credits, instructors, schedules, rooms, and availability.', icon: BookOpen, summary: 'Course catalog', rows: [{ label: 'Catalog courses', value: '124', detail: 'Across active programs' }, { label: 'Offered this term', value: '48', detail: 'Fall 2026' }, { label: 'Draft changes', value: '7', detail: 'Awaiting approval' }] },
+    'academic-periods': { title: 'Academic years / semesters', eyebrow: 'Academic structure', description: 'Control the academic calendar and the periods used for registration, grades, and reports.', icon: CalendarClock, summary: 'Academic calendar', rows: [{ label: 'Current period', value: 'Fall 2026', detail: 'Registration is open' }, { label: 'Next period', value: 'Spring 2027', detail: 'Planning window' }, { label: 'Calendar items', value: '24', detail: 'Important dates' }] },
+    registration: { title: 'Registration', eyebrow: 'Academic operations', description: 'Monitor registration activity and resolve enrollment issues before deadlines.', icon: ClipboardList, summary: 'Registration operations', rows: [{ label: 'Registered students', value: '1,102', detail: 'Fall 2026' }, { label: 'Pending reviews', value: '28', detail: 'Need administrative action' }, { label: 'Completion', value: '88%', detail: 'Current registration cycle' }] },
+    payments: { title: 'Payments', eyebrow: 'Finance operations', description: 'Review fee collection, payment activity, balances, and finance follow-up.', icon: CreditCard, summary: 'Finance operations', rows: [{ label: 'Fee collection', value: '78%', detail: '$284k this semester' }, { label: 'Transactions', value: '2,486', detail: 'Posted this academic year' }, { label: 'Open balances', value: '164', detail: 'Require follow-up' }] },
+    results: { title: 'Results', eyebrow: 'Academic operations', description: 'Review submitted results and maintain a reliable academic record for every student.', icon: FileChartColumn, summary: 'Results administration', rows: [{ label: 'Results submitted', value: '92%', detail: 'Fall 2026 courses' }, { label: 'Awaiting submission', value: '12', detail: 'Faculty action needed' }, { label: 'Exceptions', value: '4', detail: 'Flagged for review' }] },
+    reports: { title: 'Reports', eyebrow: 'Administration', description: 'Bring enrollment, finance, academic performance, and operations into one reporting workspace.', icon: TrendingUp, summary: 'Institutional reporting', rows: [{ label: 'Saved reports', value: '16', detail: 'Available to administrators' }, { label: 'Scheduled reports', value: '5', detail: 'Sent to leadership' }, { label: 'Latest report', value: 'Today', detail: 'Fall 2026 enrollment' }] },
+  },
+  super_admin: {
+    users: { title: 'User / role management', eyebrow: 'System governance', description: 'Create, deactivate, and assign roles to every account in the LCC E-Portal.', icon: UserCog, summary: 'Identity administration', rows: [{ label: 'System users', value: '1,338', detail: 'All roles combined' }, { label: 'Roles active', value: '4', detail: 'Student, staff, admin, super admin' }, { label: 'Pending access', value: '6', detail: 'Awaiting approval' }] },
+    settings: { title: 'System settings', eyebrow: 'System governance', description: 'Control institution-wide portal settings, defaults, and operational preferences.', icon: Settings, summary: 'Portal configuration', rows: [{ label: 'Configuration groups', value: '12', detail: 'System-wide settings' }, { label: 'Last change', value: 'Today', detail: 'Reviewed by super admin' }, { label: 'Environment', value: 'Development', detail: 'Change before production' }] },
+    permissions: { title: 'Permissions', eyebrow: 'System governance', description: 'Define what each role can view, create, edit, approve, and export.', icon: SlidersHorizontal, summary: 'Access control', rows: [{ label: 'Permission groups', value: '4', detail: 'One per portal role' }, { label: 'Protected actions', value: '28', detail: 'Server-enforced rules' }, { label: 'Recent review', value: 'Sep 18', detail: 'No conflicts found' }] },
+    'audit-logs': { title: 'Audit logs', eyebrow: 'System governance', description: 'Trace account, data, and system actions for accountability and security review.', icon: ScrollText, summary: 'System activity', rows: [{ label: 'Events this month', value: '482', detail: 'All system areas' }, { label: 'Security alerts', value: '0', detail: 'No action needed' }, { label: 'Last event', value: '2 min ago', detail: 'Successful sign-in' }] },
+    system: { title: 'Database / system management', eyebrow: 'System governance', description: 'Monitor database health, background services, backups, and operational readiness.', icon: Database, summary: 'Platform health', rows: [{ label: 'System activity', value: '99.9%', detail: 'Healthy this month' }, { label: 'Database status', value: 'Healthy', detail: 'PostgreSQL connected' }, { label: 'Last backup', value: 'Today', detail: 'Development environment' }] },
+  },
+};
+
+function RoleFeaturePage() {
+  const { feature } = useParams<{ feature: string }>();
+  const userQuery = useGetCurrentUser();
+  const user = userQuery.data;
+  const definition = user ? roleFeatureCatalog[user.role]?.[feature ?? ''] : undefined;
+  if (!user || !definition) return <NotFound />;
+  const Icon = definition.icon;
+  return (
+    <div className="page-in mx-auto max-w-[1200px]" data-testid={`page-feature-${feature}`}>
+      <PageHeading
+        eyebrow={definition.eyebrow}
+        title={definition.title}
+        description={definition.description}
+        action={<div className="flex items-center gap-3 rounded-xl bg-secondary px-4 py-3"><Icon className="h-5 w-5 text-secondary-foreground" /><div><p className="text-[10px] font-bold uppercase tracking-[.12em] text-secondary-foreground/70">{roleLabels[user.role]}</p><p className="text-sm font-bold text-secondary-foreground">{definition.summary}</p></div></div>}
+      />
+      <div className="grid gap-4 md:grid-cols-3">
+        {definition.rows.map((row) => (
+          <div className="interactive rounded-2xl border border-border bg-card p-5 shadow-xs" key={row.label} data-testid={`card-feature-${row.label.toLowerCase().replaceAll(' ', '-')}`}>
+            <p className="text-sm font-medium text-muted-foreground">{row.label}</p>
+            <p className="display-font mt-3 text-3xl font-bold tracking-[-.04em]">{row.value}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{row.detail}</p>
+          </div>
+        ))}
+      </div>
+      <section className="mt-6 rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-7" data-testid="section-feature-workspace">
+        <div className="flex items-start gap-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"><Icon className="h-5 w-5" /></div>
+          <div><p className="eyebrow">Role-scoped workspace</p><h2 className="display-font mt-1 text-2xl font-bold">{definition.title} at LCC</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">This workspace is available to {roleLabels[user.role]} accounts. Access is checked by the signed-in role before the page is shown.</p></div>
+        </div>
+        <div className="mt-7 grid gap-3 sm:grid-cols-2">
+          {definition.rows.map((row, index) => <div className="flex items-center gap-3 rounded-xl bg-muted/60 px-4 py-3" key={`${row.label}-detail`}><div className="flex h-8 w-8 items-center justify-center rounded-lg bg-card text-secondary-foreground"><Check className="h-4 w-4" /></div><div><p className="text-sm font-semibold">{index === 0 ? 'Review current records' : index === 1 ? 'Take the next action' : 'Keep the portal record current'}</p><p className="text-xs text-muted-foreground">{row.label} · {row.detail}</p></div></div>)}
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function VerifyPage() {
   const [input, setInput] = useState('');
   const [number, setNumber] = useState('');
@@ -452,21 +764,38 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
 }
 
-function PrivateRoute({ children }: { children: ReactNode }) {
+function PrivateRoute({ children, roles }: { children: ReactNode; roles?: PortalRole[] }) {
   const [, setLocation] = useLocation();
   const currentUserQuery = useGetCurrentUser();
   useEffect(() => {
     if (currentUserQuery.error) setLocation('/');
-  }, [currentUserQuery.error, setLocation]);
+    if (currentUserQuery.data && roles && !roles.includes(currentUserQuery.data.role)) setLocation('/dashboard');
+  }, [currentUserQuery.data, currentUserQuery.error, roles, setLocation]);
   if (currentUserQuery.isLoading) {
     return <div className="flex min-h-[100dvh] items-center justify-center bg-background"><Loader2 className="h-6 w-6 animate-spin text-secondary-foreground" /></div>;
   }
   if (currentUserQuery.error || !currentUserQuery.data) return null;
+  if (roles && !roles.includes(currentUserQuery.data.role)) return null;
   return <AppShell>{children}</AppShell>;
 }
 
 function Router() {
-  return <RoutedErrorBoundary><Switch><Route path="/" component={LoginPage} /><Route path="/dashboard"><PrivateRoute><DashboardPage /></PrivateRoute></Route><Route path="/courses"><PrivateRoute><CoursesPage /></PrivateRoute></Route><Route path="/results"><PrivateRoute><ResultsPage /></PrivateRoute></Route><Route path="/finance"><PrivateRoute><FinancePage /></PrivateRoute></Route><Route path="/documents"><PrivateRoute><DocumentsPage /></PrivateRoute></Route><Route path="/announcements"><PrivateRoute><AnnouncementsPage /></PrivateRoute></Route><Route path="/support"><PrivateRoute><SupportPage /></PrivateRoute></Route><Route path="/verify" component={VerifyPage} /><Route component={NotFound} /></Switch></RoutedErrorBoundary>;
+  return <RoutedErrorBoundary><Switch>
+    <Route path="/" component={LoginPage} />
+    <Route path="/dashboard"><PrivateRoute><DashboardPage /></PrivateRoute></Route>
+    <Route path="/courses"><PrivateRoute roles={['student']}><CoursesPage /></PrivateRoute></Route>
+    <Route path="/results"><PrivateRoute roles={['student', 'staff', 'admin', 'super_admin']}><ResultsPage /></PrivateRoute></Route>
+    <Route path="/finance"><PrivateRoute roles={['student', 'admin', 'super_admin']}><FinancePage /></PrivateRoute></Route>
+    <Route path="/documents"><PrivateRoute roles={['student', 'admin', 'super_admin']}><DocumentsPage /></PrivateRoute></Route>
+    <Route path="/announcements"><PrivateRoute><AnnouncementsPage /></PrivateRoute></Route>
+    <Route path="/support"><PrivateRoute><SupportPage /></PrivateRoute></Route>
+    <Route path="/student/:feature"><PrivateRoute roles={['student']}><RoleFeaturePage /></PrivateRoute></Route>
+    <Route path="/staff/:feature"><PrivateRoute roles={['staff']}><RoleFeaturePage /></PrivateRoute></Route>
+    <Route path="/admin/:feature"><PrivateRoute roles={['admin', 'super_admin']}><RoleFeaturePage /></PrivateRoute></Route>
+    <Route path="/super-admin/:feature"><PrivateRoute roles={['super_admin']}><RoleFeaturePage /></PrivateRoute></Route>
+    <Route path="/verify" component={VerifyPage} />
+    <Route component={NotFound} />
+  </Switch></RoutedErrorBoundary>;
 }
 
 function App() {
