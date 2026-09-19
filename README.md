@@ -11,23 +11,16 @@ pnpm --filter @workspace/api-server run dev
 pnpm --filter @workspace/lcc-e-portal run dev
 ```
 
-The project uses the preconfigured PostgreSQL database through Drizzle ORM. The schema is in `lib/db/src/schema/` and can be pushed with:
+The project uses PostgreSQL through Drizzle ORM. The schema is in `lib/db/src/schema/` and can be pushed with:
 
 ```bash
 pnpm --filter @workspace/db run push
 ```
 
-## Development accounts
+## Data and access
 
-These accounts are seeded automatically in the development database. Change them before using a production deployment.
+The API does not create accounts, courses, announcements, payments, or documents automatically. Connect the portal to your institution's records before inviting users.
 
-| Role | Email | Development password |
-| --- | --- | --- |
-| Super Admin | `superadmin@lcc.edu.lr` | `LCC-Super-2026!` |
-| Admin | `admin@lcc.edu.lr` | `LCC-Admin-2026!` |
-| Staff | `staff@lcc.edu.lr` | `LCC-Staff-2026!` |
-| Student | `student@lcc.edu.lr` | `LCC-Student-2026!` |
+For an isolated local preview only, set `PORTAL_SEED_DATA=development` when starting the API. This is intentionally opt-in and should never be enabled for a production deployment.
 
-## Public verification
-
-Open `/verify` and use the seeded development document number `LCC-REG-2026-001` to view a public verification result. Private holder information is not exposed.
+Every authenticated route is role-scoped for students, staff, administrators, and super administrators. The frontend only presents the navigation available to the signed-in role, and the API enforces the same access boundary.

@@ -67,7 +67,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* LIGHT MODE — LCC civic editorial: warm paper, ink navy, brass, and sea-glass */
+/* LIGHT MODE — clean LCC portal with the supplied purple as the primary */
 :root {
   --button-outline: rgba(0, 0, 0, 0.1);
   --badge-outline: rgba(0, 0, 0, 0.05);
@@ -79,38 +79,38 @@
   --elevate-1: rgba(0, 0, 0, 0.03);
   --elevate-2: rgba(0, 0, 0, 0.08);
 
-  --background: 42 38% 96%;
+  --background: 0 0% 100%;
   --foreground: 222 43% 16%;
-  --border: 38 24% 86%;
-  --card: 42 45% 99%;
+  --border: 220 14% 90%;
+  --card: 0 0% 100%;
   --card-foreground: 222 43% 16%;
-  --card-border: 38 24% 86%;
-  --sidebar: 221 46% 18%;
-  --sidebar-foreground: 42 38% 96%;
-  --sidebar-border: 220 32% 26%;
-  --sidebar-primary: 42 82% 67%;
-  --sidebar-primary-foreground: 221 46% 18%;
-  --sidebar-accent: 220 34% 25%;
-  --sidebar-accent-foreground: 42 38% 96%;
-  --sidebar-ring: 42 82% 67%;
-  --popover: 42 45% 99%;
+  --card-border: 220 14% 90%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 222 43% 16%;
+  --sidebar-border: 220 14% 90%;
+  --sidebar-primary: 264 69% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 264 90% 97%;
+  --sidebar-accent-foreground: 264 69% 35%;
+  --sidebar-ring: 264 69% 48%;
+  --popover: 0 0% 100%;
   --popover-foreground: 222 43% 16%;
-  --popover-border: 38 24% 86%;
-  --primary: 221 46% 18%;
-  --primary-foreground: 42 38% 96%;
-  --secondary: 169 29% 90%;
-  --secondary-foreground: 174 34% 22%;
-  --muted: 40 23% 91%;
+  --popover-border: 220 14% 90%;
+  --primary: 264 69% 48%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 264 90% 97%;
+  --secondary-foreground: 264 69% 35%;
+  --muted: 220 14% 96%;
   --muted-foreground: 218 18% 46%;
-  --accent: 42 82% 67%;
-  --accent-foreground: 221 46% 18%;
+  --accent: 264 69% 48%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 4 62% 48%;
-  --destructive-foreground: 42 38% 96%;
-  --input: 38 24% 82%;
-  --ring: 174 34% 38%;
-  --chart-1: 174 34% 38%;
-  --chart-2: 42 82% 57%;
-  --chart-3: 221 46% 28%;
+  --destructive-foreground: 0 0% 100%;
+  --input: 220 14% 82%;
+  --ring: 264 69% 48%;
+  --chart-1: 264 69% 48%;
+  --chart-2: 264 69% 62%;
+  --chart-3: 264 69% 35%;
   --chart-4: 13 67% 57%;
   --chart-5: 82 29% 43%;
   --app-font-sans: 'DM Sans', sans-serif;
@@ -204,22 +204,22 @@
   --sidebar: 222 41% 10%;
   --sidebar-foreground: 42 38% 96%;
   --sidebar-border: 220 24% 22%;
-  --sidebar-primary: 42 82% 67%;
-  --sidebar-primary-foreground: 221 46% 18%;
-  --sidebar-accent: 220 30% 20%;
+  --sidebar-primary: 264 69% 62%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 264 38% 20%;
   --sidebar-accent-foreground: 42 38% 96%;
-  --sidebar-ring: 42 82% 67%;
+  --sidebar-ring: 264 69% 62%;
   --popover: 221 34% 17%;
   --popover-foreground: 42 38% 96%;
   --popover-border: 220 24% 25%;
-  --primary: 42 82% 67%;
-  --primary-foreground: 221 46% 18%;
+  --primary: 264 69% 62%;
+  --primary-foreground: 0 0% 100%;
   --secondary: 169 23% 27%;
   --secondary-foreground: 169 42% 88%;
   --muted: 220 26% 23%;
   --muted-foreground: 216 16% 68%;
-  --accent: 42 82% 67%;
-  --accent-foreground: 221 46% 18%;
+  --accent: 264 69% 62%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 4 62% 58%;
   --destructive-foreground: 42 38% 96%;
 
@@ -382,15 +382,10 @@
 
 @layer components {
   .portal-shell {
-    background:
-      radial-gradient(circle at 82% 8%, hsl(42 82% 67% / .12), transparent 28rem),
-      radial-gradient(circle at 8% 80%, hsl(169 29% 90% / .32), transparent 34rem),
-      hsl(var(--background));
+    background: hsl(var(--background));
   }
   .paper-grid {
-    background-image: linear-gradient(hsl(221 46% 18% / .035) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(221 46% 18% / .035) 1px, transparent 1px);
-    background-size: 28px 28px;
+    background: hsl(var(--background));
   }
   .display-font { font-family: var(--app-font-serif); }
   .mono-font { font-family: var(--app-font-mono); }

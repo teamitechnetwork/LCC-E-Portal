@@ -44,7 +44,8 @@ type PublicUser = {
 
 const router: IRouter = Router();
 const sessionCookie = "lcc_session";
-const currentSemester = "Fall 2026";
+const currentSemester = process.env.CURRENT_SEMESTER || "Current academic period";
+const seedDevelopmentData = process.env.PORTAL_SEED_DATA === "development";
 
 const demoAccounts = [
   {
@@ -180,6 +181,8 @@ function publicUser(user: typeof portalUsersTable.$inferSelect): PublicUser {
 }
 
 async function ensureSeed() {
+  if (!seedDevelopmentData) return;
+
   for (const account of demoAccounts) {
     await db
       .insert(portalUsersTable)
@@ -372,61 +375,46 @@ router.get("/auth/me", requireUser(async (_req, res, user) => {
 
 router.get("/dashboard", requireUser(async (_req, res, user) => {
   const role = user.role as Role;
-  const roleMetrics: Record<Role, Array<{ label: string; value: string; detail: string; tone: "navy" | "blue" | "gold" | "green" | "orange" | "purple" }>> = {
+  const roleMetrics: Record<Role, Array<{ label: string; tone: "navy" | "blue" | "gold" | "green" | "orange" | "purple" }>> = {
     student: [
-      { label: "Current GPA", value: "3.68", detail: "+0.14 this term", tone: "blue" },
-      { label: "Registered courses", value: "4", detail: "11 credits", tone: "gold" },
-      { label: "Outstanding balance", value: "$1,420", detail: "Due Oct 15, 2026", tone: "orange" },
-      { label: "Attendance", value: "94%", detail: "Excellent standing", tone: "green" },
+      { label: "Current GPA", tone: "blue" },
+      { label: "Registered courses", tone: "gold" },
+      { label: "Outstanding balance", tone: "orange" },
+      { label: "Attendance", tone: "green" },
     ],
     staff: [
-      { label: "Assigned courses", value: "4", detail: "138 students total", tone: "blue" },
-      { label: "Attendance to review", value: "3", detail: "Needs attention", tone: "orange" },
-      { label: "Open assignments", value: "12", detail: "Across your courses", tone: "gold" },
-      { label: "Avg. class grade", value: "82%", detail: "+4% this term", tone: "green" },
+      { label: "Assigned courses", tone: "blue" },
+      { label: "Attendance to review", tone: "orange" },
+      { label: "Open assignments", tone: "gold" },
+      { label: "Average class grade", tone: "green" },
     ],
     admin: [
-      { label: "Total students", value: "1,248", detail: "+6.4% this year", tone: "blue" },
-      { label: "Active staff", value: "86", detail: "Across 6 departments", tone: "gold" },
-      { label: "Applications", value: "342", detail: "28 awaiting review", tone: "purple" },
-      { label: "Fee collection", value: "78%", detail: "$284k this semester", tone: "green" },
+      { label: "Total students", tone: "blue" },
+      { label: "Active staff", tone: "gold" },
+      { label: "Applications", tone: "purple" },
+      { label: "Fee collection", tone: "green" },
     ],
     super_admin: [
-      { label: "System users", value: "1,338", detail: "4 roles active", tone: "blue" },
-      { label: "System activity", value: "99.9%", detail: "Healthy this month", tone: "green" },
-      { label: "Audit events", value: "482", detail: "Last 30 days", tone: "gold" },
-      { label: "Security alerts", value: "0", detail: "No action needed", tone: "purple" },
+      { label: "System users", tone: "blue" },
+      { label: "System activity", tone: "green" },
+      { label: "Audit events", tone: "gold" },
+      { label: "Security alerts", tone: "purple" },
     ],
   };
 
   const dashboard = {
     greeting: `Good morning, ${user.name.split(" ")[0]}`,
     currentSemester,
-    metrics: roleMetrics[role],
-    upcoming:
-      role === "student"
-        ? [
-            { title: "Data Structures & Algorithms", subtitle: "CSC 301 · Science 204", time: "10:00 AM", type: "class" as const },
-            { title: "Research proposal", subtitle: "BUS 315 · Due tomorrow", time: "11:59 PM", type: "deadline" as const },
-            { title: "Founders Week chapel", subtitle: "Main chapel · All students", time: "Wed, 11:00 AM", type: "event" as const },
-          ]
-        : [
-            { title: "Attendance review", subtitle: "3 classes need review", time: "Today", type: "deadline" as const },
-            { title: "Faculty senate meeting", subtitle: "Administration building", time: "Wed, 2:00 PM", type: "event" as const },
-            { title: "Grade submission window", subtitle: "Fall 2026 · Opens next week", time: "Oct 1", type: "deadline" as const },
-          ],
-    activity: [
-      { title: "Registration slip issued", detail: "Your Fall 2026 registration is confirmed.", timestamp: "2 hours ago", kind: "registration" as const },
-      { title: "Payment received", detail: "LCC-PAY-20517 · Registration fee", timestamp: "Sep 5, 2026", kind: "payment" as const },
-      { title: "New announcement", detail: "Course registration closes Friday.", timestamp: "Sep 18, 2026", kind: "announcement" as const },
-    ],
-    progress: role === "student" ? 72 : 86,
+    metrics: roleMetrics[role].map((metric) => ({ ...metric, value: "—", detail: "No live record yet" })),
+    upcoming: [],
+    activity: [],
+    progress: 0,
     role,
   };
   res.json(GetDashboardResponse.parse(dashboard));
 }));
 
-router.get("/courses", requireUser(async (req, res, user) => {
+router.get("/courses", requireRole(["student"], async (req, res, user) => {
   const params = ListCoursesQueryParams.parse(req.query);
   const [courses, registrations] = await Promise.all([
     db.select().from(portalCoursesTable),
@@ -466,30 +454,19 @@ router.post("/courses/:courseId/register", requireRole(["student"], async (req, 
 }));
 
 router.get("/results", requireUser(async (_req, res, user) => {
-  const results = user.role === "student"
-    ? [
-        { id: "result-1", courseCode: "CSC 201", courseTitle: "Introduction to Programming", credits: 3, score: 87, grade: "A", points: 4, semester: "Spring 2026" },
-        { id: "result-2", courseCode: "MAT 205", courseTitle: "Discrete Mathematics", credits: 3, score: 79, grade: "B+", points: 3.5, semester: "Spring 2026" },
-        { id: "result-3", courseCode: "COM 210", courseTitle: "Communication Skills", credits: 2, score: 91, grade: "A", points: 4, semester: "Spring 2026" },
-        { id: "result-4", courseCode: "BIB 110", courseTitle: "Foundations of Faith", credits: 2, score: 84, grade: "A-", points: 3.7, semester: "Fall 2025" },
-      ]
-    : [
-        { id: "result-staff-1", courseCode: "CSC 301", courseTitle: "Data Structures & Algorithms", credits: 3, score: 82, grade: "B+", points: 3.5, semester: currentSemester },
-        { id: "result-staff-2", courseCode: "BUS 315", courseTitle: "Entrepreneurship & Innovation", credits: 3, score: 86, grade: "A-", points: 3.7, semester: currentSemester },
-      ];
-  res.json(ListResultsResponse.parse(results));
+  res.json(ListResultsResponse.parse([]));
 }));
 
 router.get("/finance", requireRole(["student", "admin", "super_admin"], async (_req, res, user) => {
   const payments = await db.select().from(portalPaymentsTable).where(eq(portalPaymentsTable.userId, user.id));
-  const totalFees = user.role === "student" ? 3900 : 0;
+  const totalFees = 0;
   const amountPaid = payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
   res.json(
     GetFinanceResponse.parse({
       totalFees,
       amountPaid,
       outstanding: Math.max(totalFees - amountPaid, 0),
-      dueDate: "2026-10-15",
+       dueDate: "",
       payments: payments.map((payment) => ({ ...payment, amount: Number(payment.amount) })),
     }),
   );

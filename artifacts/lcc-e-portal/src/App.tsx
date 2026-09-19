@@ -183,14 +183,16 @@ const formatDate = (value?: string) => {
 
 const titleCase = (value: string) => value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 
-function LogoLockup({ compact = false }: { compact?: boolean }) {
+function LogoLockup({ compact = false, inverse = false }: { compact?: boolean; inverse?: boolean }) {
   return (
     <div className="flex items-center gap-3" data-testid="brand-lockup">
-      <img src={lccLogo} alt="Liberia Christian College" className={compact ? 'h-9 w-9 object-contain' : 'h-12 w-12 object-contain'} data-testid="img-lcc-logo" />
+      <div className={`flex shrink-0 items-center justify-center rounded-xl bg-white ${compact ? 'h-10 w-10 p-1.5' : 'h-14 w-14 p-2'}`}>
+        <img src={lccLogo} alt="Liberia Christian College" className="h-full w-full object-contain" data-testid="img-lcc-logo" />
+      </div>
       {!compact && (
         <div className="min-w-0">
-          <div className="display-font text-[15px] font-bold leading-none text-sidebar-foreground">Liberia Christian</div>
-          <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/65">College E-Portal</div>
+          <div className={`display-font text-[15px] font-bold leading-none ${inverse ? 'text-primary-foreground' : 'text-sidebar-foreground'}`}>Liberia Christian</div>
+          <div className={`mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${inverse ? 'text-primary-foreground/65' : 'text-sidebar-foreground/65'}`}>College E-Portal</div>
         </div>
       )}
     </div>
@@ -246,29 +248,44 @@ function QueryState({
 function Sidebar({ user, onLogout, onClose }: { user: User; onLogout: () => void; onClose?: () => void }) {
   const [location] = useLocation();
   const visibleNavItems = roleNavItems[user.role] ?? roleNavItems.student;
+  const getNavSection = (item: NavItem) => {
+    if (item.href === '/dashboard') return 'Overview';
+    if (item.href.includes('announcement') || item.href.includes('notification')) return 'Updates';
+    if (item.href === '/support' || item.href === '/verify') return 'Services';
+    if (user.role === 'student') {
+      if (item.href === '/finance' || item.href === '/documents' || item.href.includes('/profile')) return 'Services';
+      return 'Academics';
+    }
+    if (user.role === 'staff') return 'Teaching';
+    if (user.role === 'admin' || user.role === 'super_admin') return item.href.includes('super-admin') ? 'System governance' : 'Administration';
+    return 'Workspace';
+  };
   return (
-    <aside className="flex h-full w-[264px] shrink-0 flex-col bg-sidebar px-4 py-5 text-sidebar-foreground" data-testid="sidebar">
+    <aside className="flex h-full w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 text-sidebar-foreground" data-testid="sidebar">
       <div className="px-3 pb-7"><LogoLockup /></div>
       <div className="mb-4 rounded-xl bg-sidebar-accent/60 px-3 py-3" data-testid="card-role-context">
         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-primary">{roleLabels[user.role]}</p>
         <p className="mt-1 text-xs leading-5 text-sidebar-foreground/60">{roleDescriptions[user.role]}</p>
       </div>
       <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1" aria-label={`${roleLabels[user.role]} navigation`}>
-        {visibleNavItems.map((item) => {
+        {visibleNavItems.map((item, index) => {
           const active = location === item.href;
           const Icon = item.icon ?? LayoutDashboard;
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={`focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors ${active ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' : 'text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
-              data-testid={`link-nav-${item.label.toLowerCase()}`}
-            >
-              <Icon className="h-[18px] w-[18px]" />
-              <span>{item.label}</span>
-              {(item.label === 'Announcements' || item.label === 'Notifications') && <span className="ml-auto h-2 w-2 rounded-full bg-sidebar-primary" aria-label="Unread updates" data-testid={`indicator-unread-${item.label.toLowerCase().replaceAll(' ', '-')}`} />}
-            </Link>
+            <div key={item.href}>
+              {(index === 0 || getNavSection(item) !== getNavSection(visibleNavItems[index - 1])) && <p className="mb-2 mt-5 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground first:mt-0">{getNavSection(item)}</p>}
+              <Link
+                href={item.href}
+                onClick={onClose}
+                aria-current={active ? 'page' : undefined}
+                className={`focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors ${active ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' : 'text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
+                data-testid={`link-nav-${item.label.toLowerCase()}`}
+              >
+                <Icon className="h-[18px] w-[18px]" />
+                <span>{item.label}</span>
+                {(item.label === 'Announcements' || item.label === 'Notifications') && <span className="ml-auto h-2 w-2 rounded-full bg-sidebar-primary" aria-label="Unread updates" data-testid={`indicator-unread-${item.label.toLowerCase().replaceAll(' ', '-')}`} />}
+              </Link>
+            </div>
           );
         })}
       </nav>
@@ -313,7 +330,7 @@ function AppShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="portal-shell flex min-h-[100dvh] w-full text-foreground">
+    <div className="portal-shell flex h-[100dvh] w-full overflow-hidden text-foreground">
       <div className={`fixed inset-0 z-40 bg-primary/30 backdrop-blur-sm transition-opacity md:hidden ${mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`} onClick={() => setMobileOpen(false)} aria-hidden="true" />
       <div className={`fixed inset-y-0 left-0 z-50 transform transition-transform md:relative md:z-0 md:flex ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <Sidebar user={user} onLogout={handleLogout} onClose={() => setMobileOpen(false)} />
@@ -340,7 +357,7 @@ function AppShell({ children }: { children: ReactNode }) {
             </div>
           </div>
         </header>
-        <main className="paper-grid min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
+        <main className="paper-grid min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
       </div>
     </div>
   );
@@ -369,7 +386,7 @@ function DashboardPage() {
           <p className="mt-4 max-w-xl text-sm leading-6 text-primary-foreground/68">One clear place for your classes, results, finances, and the next step in your LCC journey.</p>
           <div className="mt-7 flex flex-wrap gap-3"><Link href="/courses" className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-bold text-accent-foreground interactive" data-testid="link-dashboard-courses">View my courses <ArrowRight className="h-4 w-4" /></Link><Link href="/announcements" className="focus-ring inline-flex min-h-11 items-center rounded-xl border border-primary-foreground/20 px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-foreground/10" data-testid="link-dashboard-announcements">Read announcements</Link></div>
         </div>
-        <div className="relative hidden min-w-[190px] items-end justify-end lg:flex"><div className="absolute right-8 top-5 h-40 w-40 rounded-full border border-accent/30" /><div className="absolute right-0 top-14 h-56 w-56 rounded-full border border-primary-foreground/10" /><div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-accent/50 bg-accent/10"><Sparkles className="h-8 w-8 text-accent" /></div></div>
+         <div className="relative hidden min-w-[190px] items-end justify-end lg:flex"><div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10"><Sparkles className="h-8 w-8 text-accent" /></div></div>
       </div>
       <QueryState loading={dashboardQuery.isLoading} error={!!dashboardQuery.error} onRetry={() => void dashboardQuery.refetch()} />
       {!dashboardQuery.isLoading && !dashboardQuery.error && (
@@ -699,6 +716,7 @@ function RoleFeaturePage() {
   const definition = user ? roleFeatureCatalog[user.role]?.[feature ?? ''] : undefined;
   if (!user || !definition) return <NotFound />;
   const Icon = definition.icon;
+  const rows = definition.rows.map((row) => ({ ...row, value: '—', detail: 'Live records will appear here.' }));
   return (
     <div className="page-in mx-auto max-w-[1200px]" data-testid={`page-feature-${feature}`}>
       <PageHeading
@@ -708,7 +726,7 @@ function RoleFeaturePage() {
         action={<div className="flex items-center gap-3 rounded-xl bg-secondary px-4 py-3"><Icon className="h-5 w-5 text-secondary-foreground" /><div><p className="text-[10px] font-bold uppercase tracking-[.12em] text-secondary-foreground/70">{roleLabels[user.role]}</p><p className="text-sm font-bold text-secondary-foreground">{definition.summary}</p></div></div>}
       />
       <div className="grid gap-4 md:grid-cols-3">
-        {definition.rows.map((row) => (
+         {rows.map((row) => (
           <div className="interactive rounded-2xl border border-border bg-card p-5 shadow-xs" key={row.label} data-testid={`card-feature-${row.label.toLowerCase().replaceAll(' ', '-')}`}>
             <p className="text-sm font-medium text-muted-foreground">{row.label}</p>
             <p className="display-font mt-3 text-3xl font-bold tracking-[-.04em]">{row.value}</p>
@@ -722,7 +740,7 @@ function RoleFeaturePage() {
           <div><p className="eyebrow">Role-scoped workspace</p><h2 className="display-font mt-1 text-2xl font-bold">{definition.title} at LCC</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">This workspace is available to {roleLabels[user.role]} accounts. Access is checked by the signed-in role before the page is shown.</p></div>
         </div>
         <div className="mt-7 grid gap-3 sm:grid-cols-2">
-          {definition.rows.map((row, index) => <div className="flex items-center gap-3 rounded-xl bg-muted/60 px-4 py-3" key={`${row.label}-detail`}><div className="flex h-8 w-8 items-center justify-center rounded-lg bg-card text-secondary-foreground"><Check className="h-4 w-4" /></div><div><p className="text-sm font-semibold">{index === 0 ? 'Review current records' : index === 1 ? 'Take the next action' : 'Keep the portal record current'}</p><p className="text-xs text-muted-foreground">{row.label} · {row.detail}</p></div></div>)}
+           {rows.map((row, index) => <div className="flex items-center gap-3 rounded-xl bg-muted/60 px-4 py-3" key={`${row.label}-detail`}><div className="flex h-8 w-8 items-center justify-center rounded-lg bg-card text-secondary-foreground"><Check className="h-4 w-4" /></div><div><p className="text-sm font-semibold">{index === 0 ? 'Review current records' : index === 1 ? 'Take the next action' : 'Keep the portal record current'}</p><p className="text-xs text-muted-foreground">{row.label} · {row.detail}</p></div></div>)}
         </div>
       </section>
     </div>
@@ -752,7 +770,36 @@ function LoginPage() {
     event.preventDefault();
     login.mutate({ data: { email, password, rememberMe } }, { onSuccess: (session) => { client.setQueryData(getGetCurrentUserQueryKey(), session.user); setLocation('/dashboard'); } });
   };
-  return <div className="flex min-h-[100dvh] bg-primary text-primary-foreground" data-testid="page-login"><div className="relative hidden w-[44%] overflow-hidden p-10 lg:flex lg:flex-col lg:justify-between"><div className="absolute -left-32 -top-32 h-96 w-96 rounded-full border border-accent/20" /><div className="absolute bottom-20 right-10 h-72 w-72 rounded-full border border-primary-foreground/10" /><LogoLockup /><div className="relative max-w-lg pb-8"><p className="eyebrow text-accent">Daily academic home</p><h1 className="display-font mt-5 text-6xl font-bold leading-[.98] tracking-[-.06em]">Keep your calling<br /><span className="text-accent">in order.</span></h1><p className="mt-6 max-w-md text-base leading-7 text-primary-foreground/65">Your classes, results, fees, and official records — close at hand, wherever your LCC day takes you.</p><div className="mt-10 flex items-center gap-3 text-xs font-semibold text-primary-foreground/55"><span className="h-px w-10 bg-accent" /> Monrovia · Liberia <span className="h-px w-10 bg-accent" /></div></div></div><div className="flex flex-1 items-center justify-center bg-background px-5 py-10 text-foreground sm:px-10"><div className="w-full max-w-[420px]"><div className="mb-10 lg:hidden"><LogoLockup compact /></div><p className="eyebrow">Welcome back</p><h2 className="display-font mt-2 text-4xl font-bold tracking-[-.04em]">Sign in to E-Portal</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">Use your LCC email to continue to your academic home.</p><form onSubmit={submit} className="mt-8 space-y-5"><label className="block"><span className="mb-2 block text-sm font-semibold">LCC email</span><input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@lcc.edu.lr" className="min-h-12 w-full rounded-xl border border-input bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="input-login-email" /></label><label className="block"><span className="mb-2 block text-sm font-semibold">Password</span><input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="min-h-12 w-full rounded-xl border border-input bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="input-login-password" /></label><div className="flex items-center justify-between gap-3"><label className="flex items-center gap-2 text-sm text-muted-foreground"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded accent-primary" data-testid="input-login-remember" /> Remember me</label><span className="text-xs font-semibold text-secondary-foreground">Need help? Visit Support</span></div>{login.error && <p className="rounded-lg bg-destructive/10 p-3 text-sm font-medium text-destructive" data-testid="status-login-error">The email or password was not recognized. Try again.</p>}<button disabled={login.isPending} className="focus-ring flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-60" data-testid="button-login-submit">{login.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Continue to portal <ArrowRight className="h-4 w-4" /></>}</button></form><div className="mt-10 flex items-center justify-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5" /> Secure access for LCC students and staff</div><Link href="/verify" className="mt-5 block text-center text-xs font-bold text-secondary-foreground underline-offset-4 hover:underline" data-testid="link-login-verify">Verify an official document without signing in</Link></div></div></div>;
+  return (
+    <div className="flex h-[100dvh] overflow-hidden bg-background text-foreground" data-testid="page-login">
+      <div className="hidden h-full w-[44%] flex-col justify-between bg-primary p-10 text-primary-foreground lg:flex">
+        <LogoLockup inverse />
+        <div className="max-w-lg pb-8">
+          <p className="eyebrow text-accent">Daily academic home</p>
+          <h1 className="display-font mt-5 text-6xl font-bold leading-[.98] tracking-[-.06em]">Keep your calling<br /><span className="text-accent">in order.</span></h1>
+          <p className="mt-6 max-w-md text-base leading-7 text-primary-foreground/65">Your classes, results, fees, and official records — close at hand, wherever your LCC day takes you.</p>
+          <div className="mt-10 flex items-center gap-3 text-xs font-semibold text-primary-foreground/55"><span className="h-px w-10 bg-accent" /> Monrovia · Liberia <span className="h-px w-10 bg-accent" /></div>
+        </div>
+      </div>
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-background px-5 py-4 text-foreground sm:px-10 sm:py-6">
+        <div className="w-full max-w-[420px]">
+          <div className="mb-6 lg:hidden"><LogoLockup compact /></div>
+          <p className="eyebrow">Welcome back</p>
+          <h2 className="display-font mt-2 text-3xl font-bold tracking-[-.04em] sm:text-4xl">Sign in to E-Portal</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Use your LCC email to continue to your academic home.</p>
+          <form onSubmit={submit} className="mt-6 space-y-4">
+            <label className="block"><span className="mb-2 block text-sm font-semibold">LCC email</span><input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@lcc.edu.lr" className="min-h-11 w-full rounded-xl border border-input bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="input-login-email" /></label>
+            <label className="block"><span className="mb-2 block text-sm font-semibold">Password</span><input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="min-h-11 w-full rounded-xl border border-input bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="input-login-password" /></label>
+            <div className="flex items-center justify-between gap-3"><label className="flex items-center gap-2 text-sm text-muted-foreground"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded accent-primary" data-testid="input-login-remember" /> Remember me</label><span className="text-xs font-semibold text-secondary-foreground">Need help? Visit Support</span></div>
+            {login.error && <p className="rounded-lg bg-destructive/10 p-3 text-sm font-medium text-destructive" data-testid="status-login-error">The email or password was not recognized. Try again.</p>}
+            <button disabled={login.isPending} className="focus-ring flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-60" data-testid="button-login-submit">{login.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Continue to portal <ArrowRight className="h-4 w-4" /></>}</button>
+          </form>
+          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5" /> Secure access for LCC students and staff</div>
+          <Link href="/verify" className="mt-3 block text-center text-xs font-bold text-secondary-foreground underline-offset-4 hover:underline" data-testid="link-login-verify">Verify an official document without signing in</Link>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function NotFound() {
