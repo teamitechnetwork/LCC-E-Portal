@@ -1,0 +1,467 @@
+Build a complete, modern, production-ready **Liberia Christian College (LCC) E-Portal**.
+
+This must be a **real working application**, not a UI prototype. Build the frontend, backend, PostgreSQL database, authentication, role permissions, APIs, and core workflows.
+
+## TECHNOLOGY
+
+Use:
+
+* React + TypeScript
+* Node.js + TypeScript
+* PostgreSQL
+* Prisma ORM
+* Tailwind CSS
+* REST API
+* React Hook Form + Zod
+* Lucide icons
+* Recharts
+* PDF generation
+* QR code generation
+
+Use the existing Replit project stack if one is already configured rather than unnecessarily replacing it.
+
+## USER ROLES
+
+Create four secure roles:
+
+1. Student
+2. Staff
+3. Admin
+4. Super Admin
+
+Use server-side role-based permissions. Users must never be able to access unauthorized APIs or pages simply by changing URLs.
+
+---
+
+# MOBILE-FIRST DESIGN — VERY IMPORTANT
+
+The portal must be designed **mobile-first**, not desktop-first.
+
+It must work exceptionally well on:
+
+* Android phones
+* iPhones
+* Small phones
+* Large phones
+* Tablets
+* Laptops
+* Desktop monitors
+
+The mobile experience must feel like a professional mobile application.
+
+### Mobile requirements
+
+* No horizontal scrolling
+* No broken tables
+* No tiny text
+* No overlapping elements
+* Touch-friendly buttons and controls
+* Minimum comfortable touch targets
+* Responsive forms
+* Responsive cards
+* Responsive charts
+* Responsive modals
+* Responsive dropdowns
+* Responsive tables with horizontal scrolling only inside the table container when absolutely necessary
+* Mobile-friendly file uploads
+* Mobile-friendly PDF/document viewing
+* Sticky mobile navigation where appropriate
+* Collapsible sidebar
+* Hamburger menu
+* Bottom navigation for important student functions where useful
+
+On mobile, prioritize:
+
+**Home | Courses | Results | Fees | More**
+
+The desktop sidebar must automatically transform into a mobile navigation system.
+
+Test the interface at approximately:
+
+**320px, 375px, 390px, 414px, 768px, 1024px, 1440px+**
+
+Do not simply shrink the desktop layout. Reorganize components intelligently for mobile.
+
+---
+
+# BRAND / UI
+
+Create a premium academic design for:
+
+**LIBERIA CHRISTIAN COLLEGE**
+
+Portal name:
+
+**LCC E-PORTAL**
+
+Style:
+
+* Modern
+* Clean
+* Professional
+* Academic
+* Trustworthy
+* Simple
+* Fast
+* Accessible
+
+Use a professional combination of:
+
+* Deep navy
+* Royal blue
+* Gold
+* White/light gray
+
+Make the branding configurable so official LCC colors/logo can be added later.
+
+---
+
+# LOGIN
+
+Create a modern responsive login page.
+
+Desktop can use a split-screen design.
+
+Mobile must use a single-column layout optimized for phones.
+
+Include:
+
+* LCC logo
+* Username/Student ID/Email
+* Password
+* Show/hide password
+* Remember me
+* Forgot password
+* Login
+* Loading state
+* Validation
+* Error messages
+
+Redirect users to the correct dashboard according to their role.
+
+---
+
+# STUDENT FEATURES
+
+Create:
+
+### Dashboard
+
+Show:
+
+* GPA
+* Current semester
+* Registered courses
+* Outstanding balance
+* Attendance
+* Academic status
+* Upcoming classes
+* Assignments
+* Announcements
+* Notifications
+
+### Academics
+
+* My Courses
+* Course Registration
+* Timetable
+* Assignments
+* Attendance
+* Results
+* GPA/CGPA
+
+### Finance
+
+* School fees
+* Amount paid
+* Outstanding balance
+* Payment history
+* Receipts
+
+### Documents
+
+* Registration slip
+* Grade report
+* Enrollment letter
+* Transcript
+* Certificates
+* Digital student ID
+
+### Other
+
+* Profile
+* Announcements
+* Notifications
+* Messages
+* Support tickets
+* Settings
+
+---
+
+# STAFF FEATURES
+
+Staff dashboard with:
+
+* Assigned courses
+* Students
+* Attendance
+* Assignments
+* Grades
+* Timetable
+* Announcements
+
+Staff can:
+
+* View assigned students
+* Take attendance
+* Create assignments
+* Receive submissions
+* Grade assignments
+* Enter grades
+* Upload course materials
+
+Staff cannot access unrestricted administrative functions.
+
+---
+
+# ADMIN FEATURES
+
+Admin dashboard with:
+
+* Total students
+* Staff
+* Programs
+* Courses
+* Applicants
+* Fees
+* Payments
+* Reports
+
+Admin can manage:
+
+* Students
+* Staff
+* Departments
+* Programs
+* Courses
+* Academic years
+* Semesters
+* Course registration
+* Attendance
+* Grades
+* Fees
+* Payments
+* Announcements
+* Admissions
+* Documents
+* Reports
+
+---
+
+# SUPER ADMIN
+
+Super Admin controls the entire system.
+
+Include:
+
+* Admin management
+* Roles
+* Permissions
+* System settings
+* Branding
+* Academic configuration
+* Grading configuration
+* Audit logs
+* Security settings
+* System activity
+
+Only Super Admin can create/manage other Admin accounts.
+
+---
+
+# DOCUMENTS & VERIFICATION
+
+Generate professional PDFs for:
+
+* Admission letters
+* Registration slips
+* Grade reports
+* Transcripts
+* Enrollment letters
+* Payment receipts
+* Student IDs
+
+Every official document should have:
+
+* Unique verification number
+* Issue date
+* LCC branding
+* QR code
+
+Create a public:
+
+**/verify**
+
+page where someone can enter the verification number or scan the QR code to verify the document.
+
+Do not expose private student information.
+
+---
+
+# FINANCE
+
+Create a proper fee system:
+
+* Tuition
+* Registration
+* Other fees
+* Discounts
+* Scholarships
+* Payments
+* Balances
+* Receipts
+
+Initially support recording payments without pretending that an online payment was successful.
+
+Structure the system so Mobile Money, bank and card gateways can be integrated later.
+
+---
+
+# DATABASE
+
+Use PostgreSQL + Prisma.
+
+Create proper relational models for:
+
+* Users
+* Roles
+* Permissions
+* Students
+* Staff
+* Departments
+* Programs
+* Courses
+* Academic Years
+* Semesters
+* Enrollments
+* Attendance
+* Assignments
+* Grades
+* Fees
+* Payments
+* Receipts
+* Documents
+* Announcements
+* Notifications
+* Admissions
+* Support Tickets
+* Messages
+* Audit Logs
+* System Settings
+
+Use migrations and seed data.
+
+---
+
+# SECURITY
+
+Implement:
+
+* Secure password hashing
+* Authentication
+* Server-side authorization
+* Role-based permissions
+* Input validation
+* Secure file uploads
+* Rate limiting
+* Password reset
+* Session security
+* Audit logs
+* Protection against common web vulnerabilities
+
+Never store plain-text passwords.
+
+Never expose secrets in frontend code.
+
+---
+
+# DEMO ACCOUNTS
+
+Create development accounts:
+
+Super Admin:
+[superadmin@lcc.edu.lr](mailto:superadmin@lcc.edu.lr)
+
+Admin:
+[admin@lcc.edu.lr](mailto:admin@lcc.edu.lr)
+
+Staff:
+[staff@lcc.edu.lr](mailto:staff@lcc.edu.lr)
+
+Student:
+[student@lcc.edu.lr](mailto:student@lcc.edu.lr)
+
+Use clearly marked development passwords and document them in README.
+
+---
+
+# IMPORTANT BUILD REQUIREMENTS
+
+Actually build the application.
+
+Do not leave major features as static mockups.
+
+Connect frontend → API → database.
+
+Create:
+
+* Database schema
+* Migrations
+* Seed script
+* Authentication
+* APIs
+* Pages
+* Components
+* Forms
+* Validation
+* Error handling
+* Loading states
+* Empty states
+* Responsive navigation
+
+Use environment variables for secrets and database configuration.
+
+Create `.env.example`.
+
+Make sure the project supports:
+
+`npm run dev`
+
+`npm run build`
+
+`npm start`
+
+All build dependencies, including TypeScript, must be declared in `package.json`. Do not rely on globally installed packages.
+
+---
+
+# FINAL REQUIREMENT
+
+Before finishing:
+
+1. Run type checking.
+2. Run the production build.
+3. Fix all errors.
+4. Test all four roles.
+5. Test authentication and permissions.
+6. Test course registration.
+7. Test grades.
+8. Test attendance.
+9. Test fees and receipts.
+10. Test document verification.
+11. Test PDF generation.
+12. Test mobile layouts.
+
+**Mobile responsiveness is a core requirement of this project. Do not consider the project complete if any major page looks broken or difficult to use on a 320–414px phone screen.**
+
+Build the system with a clean architecture so additional LCC features can be added later without rewriting the application.

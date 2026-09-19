@@ -1,6 +1,6 @@
-# [Project name]
+# Liberia Christian College E-Portal
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Mobile-first academic portal for LCC students, staff, administrators, and public document verification.
 
 ## Run & Operate
 
@@ -22,15 +22,22 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/lcc-e-portal` — React/Vite portal UI and responsive role-aware navigation
+- `artifacts/api-server/src/routes/portal.ts` — session auth, portal APIs, seed accounts, and public verification
+- `lib/api-spec/openapi.yaml` — source of truth for generated API hooks and Zod contracts
+- `lib/db/src/schema/portal.ts` — Drizzle schema for portal users, sessions, courses, records, and support tickets
+- `README.md` — development commands and demo accounts
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Keep the existing pnpm monorepo and Drizzle/PostgreSQL stack rather than introducing a second ORM.
+- Use HTTP-only cookie sessions backed by PostgreSQL; the server derives the current user and enforces role permissions.
+- Keep public document verification separate from authenticated portal data and never return the document holder's private name.
+- Use the supplied LCC mark and a configurable CSS token layer so official branding can be refined later.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The portal provides a polished mobile-first sign-in experience, role-aware dashboards, course registration, results, fees and payment history, official document records, announcements, support tickets, and public verification.
 
 ## User preferences
 
@@ -38,7 +45,8 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The frontend Vite config expects `PORT` and `BASE_PATH`; the managed artifact workflow supplies them automatically.
+- Re-run API codegen after changing `lib/api-spec/openapi.yaml`.
 
 ## Pointers
 
