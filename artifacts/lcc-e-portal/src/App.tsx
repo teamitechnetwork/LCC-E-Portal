@@ -96,7 +96,8 @@ const fallbackUser: User = {
 };
 
 type PortalRole = User['role'];
-type NavItem = { href: string; label: string; icon: typeof LayoutDashboard };
+type NavSection = 'Overview' | 'Academics' | 'Teaching' | 'People' | 'Services' | 'Finance' | 'Insights' | 'Governance' | 'Updates';
+type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; section: NavSection };
 
 const roleLabels: Record<PortalRole, string> = {
   student: 'Student Portal',
@@ -114,62 +115,62 @@ const roleDescriptions: Record<PortalRole, string> = {
 
 const roleNavItems: Record<PortalRole, NavItem[]> = {
   student: [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/courses', label: 'Course registration', icon: BookOpen },
-    { href: '/student/my-courses', label: 'My courses', icon: ClipboardList },
-    { href: '/student/class-schedule', label: 'Class schedule', icon: CalendarDays },
-    { href: '/results', label: 'Grades / results', icon: GraduationCap },
-    { href: '/student/transcript', label: 'Transcript', icon: FileChartColumn },
-    { href: '/finance', label: 'Fees & payments', icon: WalletCards },
-    { href: '/student/attendance', label: 'Attendance', icon: ClipboardCheck },
-    { href: '/student/assignments', label: 'Assignments', icon: ListChecks },
-    { href: '/announcements', label: 'Announcements', icon: Bell },
-    { href: '/student/notifications', label: 'Notifications', icon: Bell },
-    { href: '/student/profile', label: 'Student profile', icon: UserRound },
-    { href: '/documents', label: 'Download documents', icon: FileText },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, section: 'Overview' },
+    { href: '/student/my-courses', label: 'My courses', icon: ClipboardList, section: 'Academics' },
+    { href: '/courses', label: 'Course registration', icon: BookOpen, section: 'Academics' },
+    { href: '/student/class-schedule', label: 'Class schedule', icon: CalendarDays, section: 'Academics' },
+    { href: '/results', label: 'Grades & results', icon: GraduationCap, section: 'Academics' },
+    { href: '/student/transcript', label: 'Transcript', icon: FileChartColumn, section: 'Academics' },
+    { href: '/student/attendance', label: 'Attendance', icon: ClipboardCheck, section: 'Services' },
+    { href: '/student/assignments', label: 'Assignments', icon: ListChecks, section: 'Services' },
+    { href: '/documents', label: 'Download documents', icon: FileText, section: 'Services' },
+    { href: '/student/profile', label: 'Student profile', icon: UserRound, section: 'Services' },
+    { href: '/finance', label: 'Fees & payments', icon: WalletCards, section: 'Finance' },
+    { href: '/announcements', label: 'Announcements', icon: Bell, section: 'Updates' },
+    { href: '/student/notifications', label: 'Notifications', icon: Bell, section: 'Updates' },
   ],
   staff: [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/staff/assigned-courses', label: 'Assigned courses', icon: BookOpen },
-    { href: '/staff/class-lists', label: 'Class lists', icon: Users },
-    { href: '/staff/attendance', label: 'Attendance', icon: ClipboardCheck },
-    { href: '/staff/grade-submission', label: 'Grade submission', icon: GraduationCap },
-    { href: '/staff/course-materials', label: 'Course materials', icon: FileText },
-    { href: '/staff/student-records', label: 'Student records', icon: UserRound },
-    { href: '/announcements', label: 'Announcements', icon: Bell },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, section: 'Overview' },
+    { href: '/staff/assigned-courses', label: 'Assigned courses', icon: BookOpen, section: 'Teaching' },
+    { href: '/staff/class-lists', label: 'Class lists', icon: Users, section: 'Teaching' },
+    { href: '/staff/attendance', label: 'Attendance', icon: ClipboardCheck, section: 'Teaching' },
+    { href: '/staff/grade-submission', label: 'Grade submission', icon: GraduationCap, section: 'Teaching' },
+    { href: '/staff/course-materials', label: 'Course materials', icon: FileText, section: 'Teaching' },
+    { href: '/staff/student-records', label: 'Student records', icon: UserRound, section: 'People' },
+    { href: '/announcements', label: 'Announcements', icon: Bell, section: 'Updates' },
   ],
   admin: [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/students', label: 'Students', icon: Users },
-    { href: '/admin/staff', label: 'Staff', icon: UserRound },
-    { href: '/admin/departments', label: 'Departments', icon: Building2 },
-    { href: '/admin/programs', label: 'Programs', icon: GraduationCap },
-    { href: '/admin/courses', label: 'Courses', icon: BookOpen },
-    { href: '/admin/academic-periods', label: 'Academic years / semesters', icon: CalendarClock },
-    { href: '/admin/registration', label: 'Registration', icon: ClipboardList },
-    { href: '/admin/payments', label: 'Payments', icon: CreditCard },
-    { href: '/admin/results', label: 'Results', icon: FileChartColumn },
-    { href: '/admin/reports', label: 'Reports', icon: TrendingUp },
-    { href: '/announcements', label: 'Announcements', icon: Bell },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, section: 'Overview' },
+    { href: '/admin/students', label: 'Students', icon: Users, section: 'People' },
+    { href: '/admin/staff', label: 'Staff', icon: UserRound, section: 'People' },
+    { href: '/admin/departments', label: 'Departments', icon: Building2, section: 'Academics' },
+    { href: '/admin/programs', label: 'Programs', icon: GraduationCap, section: 'Academics' },
+    { href: '/admin/courses', label: 'Courses', icon: BookOpen, section: 'Academics' },
+    { href: '/admin/academic-periods', label: 'Academic years / semesters', icon: CalendarClock, section: 'Academics' },
+    { href: '/admin/registration', label: 'Registration', icon: ClipboardList, section: 'Academics' },
+    { href: '/admin/results', label: 'Results', icon: FileChartColumn, section: 'Academics' },
+    { href: '/admin/payments', label: 'Payments', icon: CreditCard, section: 'Finance' },
+    { href: '/admin/reports', label: 'Reports', icon: TrendingUp, section: 'Insights' },
+    { href: '/announcements', label: 'Announcements', icon: Bell, section: 'Updates' },
   ],
   super_admin: [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/students', label: 'Students', icon: Users },
-    { href: '/admin/staff', label: 'Staff', icon: UserRound },
-    { href: '/admin/departments', label: 'Departments', icon: Building2 },
-    { href: '/admin/programs', label: 'Programs', icon: GraduationCap },
-    { href: '/admin/courses', label: 'Courses', icon: BookOpen },
-    { href: '/admin/academic-periods', label: 'Academic years / semesters', icon: CalendarClock },
-    { href: '/admin/registration', label: 'Registration', icon: ClipboardList },
-    { href: '/admin/payments', label: 'Payments', icon: CreditCard },
-    { href: '/admin/results', label: 'Results', icon: FileChartColumn },
-    { href: '/admin/reports', label: 'Reports', icon: TrendingUp },
-    { href: '/super-admin/users', label: 'User / role management', icon: UserCog },
-    { href: '/super-admin/settings', label: 'System settings', icon: Settings },
-    { href: '/super-admin/permissions', label: 'Permissions', icon: SlidersHorizontal },
-    { href: '/super-admin/audit-logs', label: 'Audit logs', icon: ScrollText },
-    { href: '/super-admin/system', label: 'Database / system management', icon: Database },
-    { href: '/announcements', label: 'Announcements', icon: Bell },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, section: 'Overview' },
+    { href: '/admin/students', label: 'Students', icon: Users, section: 'People' },
+    { href: '/admin/staff', label: 'Staff', icon: UserRound, section: 'People' },
+    { href: '/super-admin/users', label: 'User & role management', icon: UserCog, section: 'People' },
+    { href: '/admin/departments', label: 'Departments', icon: Building2, section: 'Academics' },
+    { href: '/admin/programs', label: 'Programs', icon: GraduationCap, section: 'Academics' },
+    { href: '/admin/courses', label: 'Courses', icon: BookOpen, section: 'Academics' },
+    { href: '/admin/academic-periods', label: 'Academic years / semesters', icon: CalendarClock, section: 'Academics' },
+    { href: '/admin/registration', label: 'Registration', icon: ClipboardList, section: 'Academics' },
+    { href: '/admin/results', label: 'Results', icon: FileChartColumn, section: 'Academics' },
+    { href: '/admin/payments', label: 'Payments', icon: CreditCard, section: 'Finance' },
+    { href: '/admin/reports', label: 'Reports', icon: TrendingUp, section: 'Insights' },
+    { href: '/super-admin/settings', label: 'System settings', icon: Settings, section: 'Governance' },
+    { href: '/super-admin/permissions', label: 'Permissions', icon: SlidersHorizontal, section: 'Governance' },
+    { href: '/super-admin/audit-logs', label: 'Audit logs', icon: ScrollText, section: 'Governance' },
+    { href: '/super-admin/system', label: 'Database / system management', icon: Database, section: 'Governance' },
+    { href: '/announcements', label: 'Announcements', icon: Bell, section: 'Updates' },
   ],
 };
 
@@ -268,62 +269,52 @@ function QueryState({
 function Sidebar({ user, onLogout, onClose }: { user: User; onLogout: () => void; onClose?: () => void }) {
   const [location] = useLocation();
   const visibleNavItems = roleNavItems[user.role] ?? roleNavItems.student;
-  const getNavSection = (item: NavItem) => {
-    if (item.href === '/dashboard') return 'Overview';
-    if (item.href.includes('announcement') || item.href.includes('notification')) return 'Updates';
-    if (item.href === '/support' || item.href === '/verify') return 'Services';
-    if (user.role === 'student') {
-      if (item.href === '/finance' || item.href === '/documents' || item.href.includes('/profile')) return 'Services';
-      return 'Academics';
-    }
-    if (user.role === 'staff') return 'Teaching';
-    if (user.role === 'admin' || user.role === 'super_admin') return item.href.includes('super-admin') ? 'System governance' : 'Administration';
-    return 'Workspace';
-  };
   return (
-    <aside className="flex h-full w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 text-sidebar-foreground" data-testid="sidebar">
-      <div className="px-3 pb-7"><LogoLockup /></div>
-      <div className="mb-4 rounded-xl bg-sidebar-accent/60 px-3 py-3" data-testid="card-role-context">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-primary">{roleLabels[user.role]}</p>
+    <aside className="flex h-full w-[280px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 text-sidebar-foreground shadow-[4px_0_20px_rgba(45,25,70,0.04)]" data-testid="sidebar">
+      <div className="px-3 pb-6"><LogoLockup /></div>
+      <div className="mb-5 rounded-2xl border border-sidebar-border bg-sidebar-accent/55 px-4 py-3.5" data-testid="card-role-context">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-primary">Signed in as</p>
+        <p className="mt-1 text-sm font-bold text-sidebar-accent-foreground">{roleLabels[user.role]}</p>
         <p className="mt-1 text-xs leading-5 text-sidebar-foreground/60">{roleDescriptions[user.role]}</p>
       </div>
-      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1" aria-label={`${roleLabels[user.role]} navigation`}>
+      <nav className="min-h-0 flex-1 space-y-6 overflow-y-auto pr-1" aria-label={`${roleLabels[user.role]} navigation`}>
         {visibleNavItems.map((item, index) => {
           const active = location === item.href;
           const Icon = item.icon ?? LayoutDashboard;
           return (
             <div key={item.href}>
-              {(index === 0 || getNavSection(item) !== getNavSection(visibleNavItems[index - 1])) && <p className="mb-2 mt-5 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground first:mt-0">{getNavSection(item)}</p>}
+              {(index === 0 || item.section !== visibleNavItems[index - 1].section) && <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-foreground/45">{item.section}</p>}
               <Link
                 href={item.href}
                 onClick={onClose}
                 aria-current={active ? 'page' : undefined}
-                className={`focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors ${active ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' : 'text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
+                className={`focus-ring group flex min-h-11 items-center gap-3 rounded-xl border px-3 text-sm font-semibold transition-all ${active ? 'border-sidebar-primary/15 bg-sidebar-primary text-sidebar-primary-foreground shadow-sm shadow-sidebar-primary/15' : 'border-transparent text-sidebar-foreground/70 hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
                 data-testid={`link-nav-${item.label.toLowerCase()}`}
               >
-                <Icon className="h-[18px] w-[18px]" />
+                <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-sidebar-primary-foreground' : 'text-sidebar-primary/75 group-hover:text-sidebar-primary'}`} />
                 <span>{item.label}</span>
-                {(item.label === 'Announcements' || item.label === 'Notifications') && <span className="ml-auto h-2 w-2 rounded-full bg-sidebar-primary" aria-label="Unread updates" data-testid={`indicator-unread-${item.label.toLowerCase().replaceAll(' ', '-')}`} />}
+                {(item.label === 'Announcements' || item.label === 'Notifications') && <span className={`ml-auto h-2 w-2 rounded-full ${active ? 'bg-sidebar-primary-foreground' : 'bg-sidebar-primary'}`} aria-label="Unread updates" data-testid={`indicator-unread-${item.label.toLowerCase().replaceAll(' ', '-')}`} />}
               </Link>
             </div>
           );
         })}
       </nav>
       <div className="mt-auto space-y-2 pt-8">
-        <Link href="/support" onClick={onClose} className="focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="link-nav-support">
-          <Headphones className="h-[18px] w-[18px]" /><span>Support desk</span>
+        <p className="px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-foreground/45">Quick access</p>
+        <Link href="/support" onClick={onClose} className="focus-ring group flex min-h-11 items-center gap-3 rounded-xl border border-transparent px-3 text-sm font-semibold text-sidebar-foreground/70 hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="link-nav-support">
+          <Headphones className="h-[18px] w-[18px] text-sidebar-primary/75 group-hover:text-sidebar-primary" /><span>Support desk</span>
         </Link>
-        <Link href="/verify" onClick={onClose} className="focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="link-nav-verify">
-          <ShieldCheck className="h-[18px] w-[18px]" /><span>Verify a document</span>
+        <Link href="/verify" onClick={onClose} className="focus-ring group flex min-h-11 items-center gap-3 rounded-xl border border-transparent px-3 text-sm font-semibold text-sidebar-foreground/70 hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="link-nav-verify">
+          <ShieldCheck className="h-[18px] w-[18px] text-sidebar-primary/75 group-hover:text-sidebar-primary" /><span>Verify a document</span>
         </Link>
         <div className="my-4 h-px bg-sidebar-border" />
-        <div className="flex items-center gap-3 rounded-xl bg-sidebar-accent/60 p-3" data-testid="card-sidebar-user">
+        <div className="flex items-center gap-3 rounded-2xl border border-sidebar-border bg-sidebar-accent/45 p-3" data-testid="card-sidebar-user">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-xs font-bold text-sidebar-primary-foreground" data-testid="avatar-sidebar">{user.avatarInitials || 'LC'}</div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{user.name}</p>
-            <p className="truncate text-[11px] text-sidebar-foreground/55">{titleCase(user.role)}</p>
+            <p className="truncate text-[11px] text-sidebar-foreground/55">{titleCase(user.role)} account</p>
           </div>
-          <button onClick={onLogout} aria-label="Sign out" className="focus-ring rounded-lg p-2 text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground" data-testid="button-logout">
+          <button onClick={onLogout} aria-label="Sign out" className="focus-ring rounded-lg p-2 text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="button-logout">
             <LogOut className="h-4 w-4" />
           </button>
         </div>

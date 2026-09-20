@@ -67,7 +67,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* LIGHT MODE — clean LCC portal with the supplied purple as the primary */
+/* LIGHT MODE — white navigation with LCC purple as the secondary accent */
 :root {
   --button-outline: rgba(0, 0, 0, 0.1);
   --badge-outline: rgba(0, 0, 0, 0.05);
@@ -85,14 +85,14 @@
   --card: 0 0% 100%;
   --card-foreground: 222 43% 16%;
   --card-border: 220 14% 90%;
-  --sidebar: 275 74% 31%;
-  --sidebar-foreground: 0 0% 100%;
-  --sidebar-border: 275 60% 40%;
-  --sidebar-primary: 23 100% 50%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 222 43% 16%;
+  --sidebar-border: 220 14% 90%;
+  --sidebar-primary: 275 74% 31%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 275 55% 38%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 23 100% 50%;
+  --sidebar-accent: 275 60% 96%;
+  --sidebar-accent-foreground: 275 74% 31%;
+  --sidebar-ring: 275 74% 31%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 43% 16%;
   --popover-border: 220 14% 90%;
