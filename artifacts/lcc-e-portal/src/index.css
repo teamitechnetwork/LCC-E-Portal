@@ -395,33 +395,39 @@
     position: relative;
     isolation: isolate;
   }
-  .login-sign-card::before {
+  .login-sign-ring {
     position: absolute;
-    inset: -2px;
+    inset: -4px;
     z-index: 0;
-    border-radius: inherit;
-    padding: 2px;
-    background: conic-gradient(
-      from 0deg,
-      transparent 0 16%,
-      hsl(277 100% 76%) 20%,
-      hsl(45 100% 68%) 25%,
-      transparent 31% 64%,
-      hsl(277 100% 68%) 70%,
-      hsl(45 100% 72%) 75%,
-      transparent 81% 100%
-    );
-    content: '';
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
     pointer-events: none;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+    overflow: visible;
     filter: drop-shadow(0 0 4px hsl(277 100% 70% / .42)) drop-shadow(0 0 4px hsl(45 100% 65% / .3));
-    animation: login-neon-ring 5.5s linear infinite;
   }
   .login-sign-card > * {
     position: relative;
     z-index: 1;
+  }
+  .login-sign-card > .login-sign-ring {
+    position: absolute;
+    z-index: 0;
+  }
+  .login-sign-ring-track {
+    fill: none;
+    stroke: hsl(277 74% 31% / .16);
+    stroke-width: 1.6;
+    vector-effect: non-scaling-stroke;
+  }
+  .login-sign-ring-runner {
+    fill: none;
+    stroke: url(#login-sign-ring-gradient);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-dasharray: 18 82;
+    stroke-dashoffset: 0;
+    vector-effect: non-scaling-stroke;
+    animation: login-sign-ring-run 3.8s linear infinite;
   }
   @media (min-width: 1024px) {
     .login-mobile-surface {
@@ -429,7 +435,7 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .login-sign-card::before {
+    .login-sign-ring-runner {
       animation: none;
     }
   }
@@ -449,6 +455,6 @@
 
 @keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes login-neon-ring {
-  to { transform: rotate(360deg); }
+@keyframes login-sign-ring-run {
+  to { stroke-dashoffset: -100; }
 }
