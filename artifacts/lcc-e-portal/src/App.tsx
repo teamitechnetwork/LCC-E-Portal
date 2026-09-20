@@ -854,8 +854,8 @@ function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-white px-3 py-3 text-foreground sm:px-8 sm:py-4 lg:px-12">
-        <div className="flex max-h-full w-full max-w-[460px] flex-col overflow-hidden rounded-[1.75rem] border border-primary/10 bg-white p-5 shadow-xl shadow-primary/5 sm:p-9 lg:border-0 lg:shadow-none">
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[linear-gradient(145deg,#3b176b_0%,#6d2aa6_52%,#f2b632_100%)] px-3 py-3 text-foreground sm:px-8 sm:py-4 lg:bg-white lg:px-12">
+        <div className="flex max-h-full w-full max-w-[460px] flex-col overflow-hidden rounded-[1.35rem] border border-white/70 bg-white p-5 shadow-2xl shadow-[#321052]/30 sm:p-9 lg:rounded-[1.75rem] lg:border-0 lg:shadow-none">
           <div className="mb-5 flex items-center justify-between gap-3 lg:hidden">
             <LogoLockup onLight />
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground" aria-label="Secure sign-in" title="Secure sign-in">
