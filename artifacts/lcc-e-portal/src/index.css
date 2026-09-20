@@ -391,24 +391,35 @@
       radial-gradient(circle at 85% 82%, hsl(43 88% 61% / .92), transparent 38%),
       linear-gradient(135deg, #32115f 0%, #5c218b 43%, #9a5b91 68%, #d9a52b 100%);
   }
-  .login-mobile-surface::before {
+  .login-sign-card {
+    position: relative;
+    isolation: isolate;
+  }
+  .login-sign-card::before {
     position: absolute;
-    inset: -30%;
-    z-index: -1;
-    background: linear-gradient(
-      112deg,
-      transparent 39%,
-      hsl(48 100% 92% / .08) 45%,
-      hsl(48 100% 96% / .52) 49%,
-      hsl(48 100% 92% / .12) 53%,
-      transparent 59%
+    inset: -2px;
+    z-index: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0 16%,
+      hsl(277 100% 76%) 20%,
+      hsl(45 100% 68%) 25%,
+      transparent 31% 64%,
+      hsl(277 100% 68%) 70%,
+      hsl(45 100% 72%) 75%,
+      transparent 81% 100%
     );
     content: '';
     pointer-events: none;
-    transform: translateX(-42%) rotate(8deg);
-    animation: login-gold-shimmer 7s ease-in-out infinite;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    filter: drop-shadow(0 0 4px hsl(277 100% 70% / .42)) drop-shadow(0 0 4px hsl(45 100% 65% / .3));
+    animation: login-neon-ring 5.5s linear infinite;
   }
-  .login-mobile-surface > * {
+  .login-sign-card > * {
     position: relative;
     z-index: 1;
   }
@@ -416,12 +427,9 @@
     .login-mobile-surface {
       background: white;
     }
-    .login-mobile-surface::before {
-      display: none;
-    }
   }
   @media (prefers-reduced-motion: reduce) {
-    .login-mobile-surface::before {
+    .login-sign-card::before {
       animation: none;
     }
   }
@@ -441,7 +449,6 @@
 
 @keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes login-gold-shimmer {
-  0%, 100% { transform: translateX(-42%) rotate(8deg); opacity: .55; }
-  50% { transform: translateX(42%) rotate(8deg); opacity: .9; }
+@keyframes login-neon-ring {
+  to { transform: rotate(360deg); }
 }
