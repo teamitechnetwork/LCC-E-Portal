@@ -851,11 +851,13 @@ function LoginPage() {
         </div>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/55">Monrovia · Liberia</p>
       </div>
-      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#f7f6f9] px-4 py-4 text-foreground sm:px-8 lg:px-12">
-        <div className="w-full max-w-[460px] rounded-[1.75rem] border border-border/80 bg-card/95 p-5 shadow-xl shadow-primary/5 sm:p-9">
-          <div className="mb-7 flex items-center justify-between gap-4 lg:hidden">
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#f7f6f9] px-3 py-3 text-foreground sm:px-8 sm:py-4 lg:px-12">
+        <div className="flex max-h-full w-full max-w-[460px] flex-col overflow-hidden rounded-[1.75rem] border border-border/80 bg-card/95 p-5 shadow-xl shadow-primary/5 sm:p-9">
+          <div className="mb-5 flex items-center justify-between gap-3 lg:hidden">
             <LogoLockup onLight />
-            <span className="rounded-full bg-secondary px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-secondary-foreground">Secure access</span>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground" aria-label="Secure sign-in" title="Secure sign-in">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
           </div>
           <div className="hidden items-center justify-between gap-4 lg:flex">
             <div>
@@ -865,29 +867,29 @@ function LoginPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground"><LockKeyhole className="h-5 w-5" /></div>
           </div>
           <div className="lg:hidden">
-            <h2 className="display-font text-3xl font-bold tracking-[-.04em]">Sign in</h2>
+            <h2 className="display-font text-[2rem] font-bold leading-none tracking-[-.05em]">Sign in</h2>
           </div>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">Use your LCC user ID or username to continue.</p>
-          <form onSubmit={submit} className="mt-6 space-y-4">
+          <p className="mt-2 text-sm text-muted-foreground">Use your LCC ID to continue.</p>
+          <form onSubmit={submit} className="mt-5 space-y-3">
             <label className="block">
-              <span className="mb-2 block text-sm font-semibold">User ID or username</span>
+              <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">User ID</span>
               <div className="relative">
                 <UserRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input required type="text" autoComplete="username" value={loginId} onChange={(event) => setLoginId(event.target.value)} placeholder="e.g. LCC-2024-0187" className="min-h-12 w-full rounded-xl border border-input bg-background pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20" data-testid="input-login-user-id" />
+                <input required type="text" autoComplete="username" value={loginId} onChange={(event) => setLoginId(event.target.value)} placeholder="ID or email" className="min-h-11 w-full rounded-xl border border-input bg-background pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20" data-testid="input-login-user-id" />
               </div>
             </label>
             <label className="block">
-              <span className="mb-2 block text-sm font-semibold">Password</span>
+              <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">Password</span>
               <div className="relative">
                 <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="min-h-12 w-full rounded-xl border border-input bg-background pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20" data-testid="input-login-password" />
+                <input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Password" className="min-h-11 w-full rounded-xl border border-input bg-background pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20" data-testid="input-login-password" />
               </div>
             </label>
-            <label className="flex items-center gap-2 pt-1 text-sm text-muted-foreground"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded accent-primary" data-testid="input-login-remember" /> Remember me</label>
-            {login.error && <p className="rounded-lg bg-destructive/10 p-3 text-sm font-medium text-destructive" data-testid="status-login-error">The user ID, username, or password was not recognized.</p>}
-            <button disabled={login.isPending} className="focus-ring flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition hover:brightness-110 disabled:opacity-60" data-testid="button-login-submit">{login.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Continue to portal <ArrowRight className="h-4 w-4" /></>}</button>
+            <label className="flex items-center gap-2 pt-1 text-xs text-muted-foreground"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded accent-primary" data-testid="input-login-remember" /> Keep me signed in</label>
+            {login.error && <p className="rounded-lg bg-destructive/10 p-2.5 text-xs font-medium text-destructive" data-testid="status-login-error">Check your ID and password.</p>}
+            <button disabled={login.isPending} className="focus-ring flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition hover:brightness-110 disabled:opacity-60" data-testid="button-login-submit">{login.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign in <ArrowRight className="h-4 w-4" /></>}</button>
           </form>
-          <Link href="/verify" className="mt-5 block text-center text-xs font-bold text-secondary-foreground underline-offset-4 hover:underline" data-testid="link-login-verify">Verify a document without signing in</Link>
+          <Link href="/verify" className="mt-4 block text-center text-[11px] font-bold text-secondary-foreground underline-offset-4 hover:underline" data-testid="link-login-verify">Verify a document</Link>
         </div>
       </div>
     </div>
