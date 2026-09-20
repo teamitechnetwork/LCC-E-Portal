@@ -212,8 +212,8 @@ function LogoLockup({ compact = false, inverse = false, onLight = false }: { com
       </div>
       {!compact && (
         <div className="min-w-0">
-          <div className={`display-font text-[15px] font-bold leading-none ${inverse ? 'text-primary-foreground' : onLight ? 'text-foreground' : 'text-sidebar-foreground'}`}>Liberia Christian</div>
-          <div className={`mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${inverse ? 'text-primary-foreground/65' : onLight ? 'text-muted-foreground' : 'text-sidebar-foreground/65'}`}>College E-Portal</div>
+          <div className={`display-font max-w-[190px] text-[14px] font-bold leading-[1.08] tracking-[-.02em] ${inverse ? 'text-primary-foreground' : onLight ? 'text-foreground' : 'text-sidebar-foreground'}`}>Liberia Christian College</div>
+          <div className={`mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${inverse ? 'text-primary-foreground/65' : onLight ? 'text-muted-foreground' : 'text-sidebar-foreground/65'}`}>Official E-Portal</div>
         </div>
       )}
     </div>
@@ -841,15 +841,24 @@ function LoginPage() {
   };
   return (
     <div className="flex h-[100dvh] overflow-hidden bg-background text-foreground" data-testid="page-login">
-      <div className="relative hidden h-full w-[44%] flex-col justify-between overflow-hidden bg-primary p-10 text-primary-foreground lg:flex">
-        <div className="pointer-events-none absolute -right-24 top-1/3 h-80 w-80 rounded-full bg-accent/15 blur-3xl" />
-        <LogoLockup inverse />
-        <div className="relative flex flex-1 items-center justify-center overflow-hidden" aria-hidden="true">
-          <div className="absolute h-72 w-72 rounded-full border border-primary-foreground/15" />
-          <div className="absolute h-52 w-52 rounded-full border border-accent/50" />
-          <div className="h-24 w-24 rotate-45 rounded-[2rem] bg-accent shadow-2xl shadow-black/20" />
+      <div className="relative hidden h-full w-[44%] flex-col overflow-hidden bg-primary p-10 text-primary-foreground lg:flex">
+        <div className="pointer-events-none absolute -right-36 top-1/4 h-[30rem] w-[30rem] rounded-full bg-accent/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-40 -left-40 h-[28rem] w-[28rem] rounded-full border border-primary-foreground/10" />
+        <div className="relative z-10 flex h-full flex-col">
+          <LogoLockup inverse />
+          <div className="relative flex flex-1 items-center justify-center overflow-hidden" aria-hidden="true">
+            <div className="absolute h-[22rem] w-[22rem] rounded-full border border-primary-foreground/10" />
+            <div className="absolute h-[17rem] w-[17rem] rounded-full border border-accent/40" />
+            <div className="absolute h-[12rem] w-[12rem] rounded-full border border-primary-foreground/10" />
+            <div className="flex h-36 w-36 items-center justify-center rounded-[2.5rem] border border-white/20 bg-white/10 shadow-2xl shadow-black/20 backdrop-blur-sm">
+              <img src={lccLogo} alt="" className="h-24 w-24 object-contain" />
+            </div>
+          </div>
+          <div className="flex items-end justify-between gap-5 border-t border-primary-foreground/15 pt-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/60">Monrovia · Liberia</p>
+            <p className="text-right text-xs font-medium text-primary-foreground/45">Learn · Serve · Lead</p>
+          </div>
         </div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/55">Monrovia · Liberia</p>
       </div>
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#f7f6f9] px-3 py-3 text-foreground sm:px-8 sm:py-4 lg:px-12">
         <div className="flex max-h-full w-full max-w-[460px] flex-col overflow-hidden rounded-[1.75rem] border border-border/80 bg-card/95 p-5 shadow-xl shadow-primary/5 sm:p-9">
@@ -861,7 +870,7 @@ function LoginPage() {
           </div>
           <div className="hidden items-center justify-between gap-4 lg:flex">
             <div>
-              <p className="eyebrow text-primary">LCC E-Portal</p>
+              <p className="eyebrow text-primary">Liberia Christian College</p>
               <h2 className="display-font mt-2 text-4xl font-bold tracking-[-.05em]">Sign in</h2>
             </div>
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground"><LockKeyhole className="h-5 w-5" /></div>
