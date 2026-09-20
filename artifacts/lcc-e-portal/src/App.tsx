@@ -853,17 +853,7 @@ function LoginPage() {
       </div>
       <div className="login-mobile-surface flex min-h-0 flex-1 items-center justify-center overflow-hidden px-3 py-3 text-foreground sm:px-8 sm:py-4 lg:bg-white lg:px-12">
         <div className="login-sign-card flex max-h-full w-full max-w-[460px] flex-col overflow-visible rounded-[1.35rem] border border-white/70 bg-white p-5 shadow-2xl shadow-[#321052]/30 sm:p-9 lg:rounded-[1.75rem] lg:border-0 lg:shadow-none">
-          <svg className="login-sign-ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="login-sign-ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#c16cff" />
-                <stop offset="52%" stopColor="#f6c84c" />
-                <stop offset="100%" stopColor="#8d36e8" />
-              </linearGradient>
-            </defs>
-            <rect className="login-sign-ring-track" x="3" y="3" width="94" height="94" rx="8" pathLength="100" />
-            <rect className="login-sign-ring-runner" x="3" y="3" width="94" height="94" rx="8" pathLength="100" />
-          </svg>
+          <div className="login-sign-ring" aria-hidden="true" />
           <div className="mb-5 flex items-center justify-between gap-3 lg:hidden">
             <LogoLockup onLight />
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground" aria-label="Secure sign-in" title="Secure sign-in">

@@ -5,6 +5,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@property --login-ring-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -397,13 +403,24 @@
   }
   .login-sign-ring {
     position: absolute;
-    inset: -4px;
+    inset: -3px;
     z-index: 0;
-    width: calc(100% + 8px);
-    height: calc(100% + 8px);
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(
+      from var(--login-ring-angle),
+      #f013c5 0deg,
+      #8b48ff 92deg,
+      #22c7ff 180deg,
+      #7547ff 265deg,
+      #f013c5 360deg
+    );
     pointer-events: none;
-    overflow: visible;
-    filter: drop-shadow(0 0 4px hsl(277 100% 70% / .42)) drop-shadow(0 0 4px hsl(45 100% 65% / .3));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    filter: drop-shadow(0 0 4px hsl(286 100% 67% / .5)) drop-shadow(0 0 4px hsl(196 100% 65% / .35));
+    animation: login-gradient-ring 5s linear infinite;
   }
   .login-sign-card > * {
     position: relative;
@@ -413,29 +430,13 @@
     position: absolute;
     z-index: 0;
   }
-  .login-sign-ring-track {
-    fill: none;
-    stroke: hsl(277 74% 31% / .16);
-    stroke-width: 1.6;
-    vector-effect: non-scaling-stroke;
-  }
-  .login-sign-ring-runner {
-    fill: none;
-    stroke: url(#login-sign-ring-gradient);
-    stroke-width: 2.4;
-    stroke-linecap: round;
-    stroke-dasharray: 18 82;
-    stroke-dashoffset: 0;
-    vector-effect: non-scaling-stroke;
-    animation: login-sign-ring-run 3.8s linear infinite;
-  }
   @media (min-width: 1024px) {
     .login-mobile-surface {
       background: white;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .login-sign-ring-runner {
+    .login-sign-ring {
       animation: none;
     }
   }
@@ -455,6 +456,6 @@
 
 @keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes login-sign-ring-run {
-  to { stroke-dashoffset: -100; }
+@keyframes login-gradient-ring {
+  to { --login-ring-angle: 360deg; }
 }
