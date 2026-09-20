@@ -7,6 +7,17 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+const allowedOrigins = new Set(
+  (process.env.CORS_ORIGINS ??
+    [
+      "https://lcc-e-portal-wilmotit-itechteam.vercel.app",
+      "https://lcc-e-portal-wilmotit-git-main-itechteam.vercel.app",
+    ].join(","))
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+);
+
 app.use(
   pinoHttp({
     logger,
@@ -26,7 +37,18 @@ app.use(
     },
   }),
 );
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.has(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(null, false);
+    },
+    credentials: true,
+  }),
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

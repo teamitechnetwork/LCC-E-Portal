@@ -46,6 +46,10 @@ const router: IRouter = Router();
 const sessionCookie = "lcc_session";
 const currentSemester = process.env.CURRENT_SEMESTER || "Current academic period";
 const seedDevelopmentData = process.env.PORTAL_SEED_DATA === "development";
+const sessionCookieAttributes =
+  process.env.NODE_ENV === "production"
+    ? "HttpOnly; Path=/; SameSite=None; Secure"
+    : "HttpOnly; Path=/; SameSite=Lax";
 
 const demoAccounts = [
   {
@@ -351,7 +355,7 @@ router.post("/auth/login", async (req, res) => {
     await db.insert(portalSessionsTable).values({ token, userId: user.id, expiresAt });
     res.setHeader(
       "Set-Cookie",
-      `${sessionCookie}=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${input.rememberMe ? 2592000 : 86400}`,
+      `${sessionCookie}=${token}; ${sessionCookieAttributes}; Max-Age=${input.rememberMe ? 2592000 : 86400}`,
     );
     res.json(LoginResponse.parse({ user: publicUser(user), expiresAt: expiresAt.toISOString() }));
   } catch (error) {
@@ -366,7 +370,7 @@ router.post("/auth/logout", async (req, res) => {
     if (token) {
       await db.delete(portalSessionsTable).where(eq(portalSessionsTable.token, token));
     }
-    res.setHeader("Set-Cookie", `${sessionCookie}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`);
+    res.setHeader("Set-Cookie", `${sessionCookie}=; ${sessionCookieAttributes}; Max-Age=0`);
     res.status(204).send();
   } catch (error) {
     req.log.error({ err: error }, "Logout failed");

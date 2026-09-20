@@ -16,6 +16,7 @@ import {
   getGetCurrentUserQueryKey,
   getListCoursesQueryKey,
   getVerifyDocumentQueryKey,
+  setBaseUrl,
   type Announcement,
   type Course,
   type Document as LccDocument,
@@ -85,6 +86,8 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+setBaseUrl(import.meta.env.VITE_API_ORIGIN || null);
 
 const fallbackUser: User = {
   id: 'guest',
