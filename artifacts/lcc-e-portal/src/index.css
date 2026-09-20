@@ -384,6 +384,47 @@
   .portal-shell {
     background: hsl(var(--background));
   }
+  .login-mobile-surface {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(circle at 85% 82%, hsl(43 88% 61% / .92), transparent 38%),
+      linear-gradient(135deg, #32115f 0%, #5c218b 43%, #9a5b91 68%, #d9a52b 100%);
+  }
+  .login-mobile-surface::before {
+    position: absolute;
+    inset: -30%;
+    z-index: -1;
+    background: linear-gradient(
+      112deg,
+      transparent 39%,
+      hsl(48 100% 92% / .08) 45%,
+      hsl(48 100% 96% / .52) 49%,
+      hsl(48 100% 92% / .12) 53%,
+      transparent 59%
+    );
+    content: '';
+    pointer-events: none;
+    transform: translateX(-42%) rotate(8deg);
+    animation: login-gold-shimmer 7s ease-in-out infinite;
+  }
+  .login-mobile-surface > * {
+    position: relative;
+    z-index: 1;
+  }
+  @media (min-width: 1024px) {
+    .login-mobile-surface {
+      background: white;
+    }
+    .login-mobile-surface::before {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .login-mobile-surface::before {
+      animation: none;
+    }
+  }
   .paper-grid {
     background: hsl(var(--background));
   }
@@ -400,3 +441,7 @@
 
 @keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes login-gold-shimmer {
+  0%, 100% { transform: translateX(-42%) rotate(8deg); opacity: .55; }
+  50% { transform: translateX(42%) rotate(8deg); opacity: .9; }
+}
