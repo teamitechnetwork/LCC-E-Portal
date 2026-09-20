@@ -204,16 +204,16 @@ const homeFlyers = [
   },
 ];
 
-function LogoLockup({ compact = false, inverse = false, onLight = false }: { compact?: boolean; inverse?: boolean; onLight?: boolean }) {
+function LogoLockup({ compact = false, inverse = false, onLight = false, large = false }: { compact?: boolean; inverse?: boolean; onLight?: boolean; large?: boolean }) {
   return (
     <div className="flex items-center gap-3" data-testid="brand-lockup">
-      <div className={`flex shrink-0 items-center justify-center rounded-xl bg-white ${compact ? 'h-10 w-10 p-1.5' : 'h-14 w-14 p-2'}`}>
+      <div className={`flex shrink-0 items-center justify-center bg-white ${large ? 'h-24 w-24 rounded-2xl p-3' : compact ? 'h-10 w-10 rounded-xl p-1.5' : 'h-14 w-14 rounded-xl p-2'}`}>
         <img src={lccLogo} alt="Liberia Christian College" className="h-full w-full object-contain" data-testid="img-lcc-logo" />
       </div>
       {!compact && (
         <div className="min-w-0">
-          <div className={`display-font max-w-[190px] text-[14px] font-bold leading-[1.08] tracking-[-.02em] ${inverse ? 'text-primary-foreground' : onLight ? 'text-foreground' : 'text-sidebar-foreground'}`}>Liberia Christian College</div>
-          <div className={`mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${inverse ? 'text-primary-foreground/65' : onLight ? 'text-muted-foreground' : 'text-sidebar-foreground/65'}`}>Official E-Portal</div>
+          <div className={`display-font font-bold leading-[1.08] tracking-[-.02em] ${large ? 'max-w-[260px] text-[22px]' : 'max-w-[190px] text-[14px]'} ${inverse ? 'text-primary-foreground' : onLight ? 'text-foreground' : 'text-sidebar-foreground'}`}>Liberia Christian College</div>
+          <div className={`mt-1 font-semibold uppercase tracking-[0.16em] ${large ? 'text-[11px]' : 'text-[10px]'} ${inverse ? 'text-primary-foreground/65' : onLight ? 'text-muted-foreground' : 'text-sidebar-foreground/65'}`}>Official E-Portal</div>
         </div>
       )}
     </div>
@@ -843,7 +843,9 @@ function LoginPage() {
     <div className="flex h-[100dvh] overflow-hidden bg-background text-foreground" data-testid="page-login">
       <div className="relative hidden h-full w-[44%] flex-col bg-primary p-10 text-primary-foreground lg:flex">
         <div className="flex h-full flex-col">
-          <LogoLockup inverse />
+          <div className="flex flex-1 items-center justify-center" aria-label="Liberia Christian College">
+            <LogoLockup inverse large />
+          </div>
           <div className="border-t border-primary-foreground/20 pt-5">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/60">Monrovia · Liberia</p>
           </div>
