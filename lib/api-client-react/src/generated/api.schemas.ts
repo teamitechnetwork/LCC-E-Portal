@@ -33,8 +33,8 @@ export interface User {
 }
 
 export interface LoginInput {
-  /** @minLength 3 */
-  email: string;
+  /** @minLength 1 */
+  login: string;
   /** @minLength 1 */
   password: string;
   rememberMe?: boolean;

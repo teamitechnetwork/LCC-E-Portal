@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import crypto from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import {
   db,
   portalAnnouncementsTable,
@@ -335,10 +335,15 @@ router.post("/auth/login", async (req, res) => {
     const [user] = await db
       .select()
       .from(portalUsersTable)
-      .where(eq(portalUsersTable.email, input.email.toLowerCase()))
+      .where(
+        or(
+          eq(portalUsersTable.identifier, input.login.trim()),
+          eq(portalUsersTable.email, input.login.trim().toLowerCase()),
+        ),
+      )
       .limit(1);
     if (!user || !verifyPassword(input.password, user.passwordHash)) {
-      res.status(401).json({ error: "The email or password is incorrect." });
+      res.status(401).json({ error: "The user ID, username, or password is incorrect." });
       return;
     }
     const token = crypto.randomBytes(32).toString("hex");

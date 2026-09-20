@@ -20,13 +20,12 @@ export const HealthCheckResponse = zod.object({
 /**
  * @summary Sign in to the portal
  */
-export const loginBodyEmailMin = 3;
 
 
 
 
 export const LoginBody = zod.object({
-  "email": zod.string().min(loginBodyEmailMin),
+  "login": zod.string().min(1),
   "password": zod.string().min(1),
   "rememberMe": zod.boolean().optional()
 })

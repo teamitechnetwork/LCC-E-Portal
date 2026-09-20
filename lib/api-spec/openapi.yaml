@@ -263,15 +263,15 @@ components:
     LoginInput:
       type: object
       properties:
-        email:
+        login:
           type: string
-          minLength: 3
+          minLength: 1
         password:
           type: string
           minLength: 1
         rememberMe:
           type: boolean
-      required: [email, password]
+      required: [login, password]
     AuthSession:
       type: object
       properties:

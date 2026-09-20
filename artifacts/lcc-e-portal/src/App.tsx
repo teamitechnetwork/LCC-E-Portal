@@ -1,374 +1,47 @@
-import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from 'react';
-import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
-import {
-  useCreateSupportTicket,
-  useGetCurrentUser,
-  useGetDashboard,
-  useGetFinance,
-  useListAnnouncements,
-  useListCourses,
-  useListDocuments,
-  useListResults,
-  useLogin,
-  useLogout,
-  useRegisterCourse,
-  useVerifyDocument,
-  getGetCurrentUserQueryKey,
-  getListCoursesQueryKey,
-  getVerifyDocumentQueryKey,
-  type Announcement,
-  type Course,
-  type Document as LccDocument,
-  type FinanceSummary,
-  type Result,
-  type SupportTicketInputCategory,
-  type User,
-} from '@workspace/api-client-react';
-import {
-  ArrowRight,
-  Bell,
-  BookOpen,
-  CalendarDays,
-  Check,
-  ChevronDown,
-  CircleHelp,
-  ClipboardList,
-  CreditCard,
-  Download,
-  FileCheck2,
-  FileText,
-  GraduationCap,
-  Headphones,
-  LayoutDashboard,
-  Loader2,
-  LockKeyhole,
-  LogOut,
-  Menu,
-  Printer,
-  ReceiptText,
-  Search,
-  Send,
-  ShieldCheck,
-  Sparkles,
-  TicketCheck,
-  TrendingUp,
-  UserRound,
-  WalletCards,
-  X,
-  Building2,
-  CalendarClock,
-  ClipboardCheck,
-  Database,
-  FileChartColumn,
-  ListChecks,
-  ScrollText,
-  Settings,
-  SlidersHorizontal,
-  UserCog,
-  Users,
-} from 'lucide-react';
-import { Link, Route, Switch, useLocation, useParams, Router as WouterRouter } from 'wouter';
-import lccLogo from '../../../.conversation/attached_assets/lcc-transparent-logo-bOg0OHhF_1789846258578.png';
-import { ErrorBoundary } from '@/components/error-boundary';
-import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
+al);
+  }, []);
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-});
+  const selectSlide = (index: number) => setActiveIndex((index + homeFlyers.length) % homeFlyers.length);
 
-const fallbackUser: User = {
-  id: 'guest',
-  name: 'LCC Community',
-  email: '',
-  role: 'student',
-  identifier: '—',
-  avatarInitials: 'LC',
-};
-
-type PortalRole = User['role'];
-type NavItem = { href: string; label: string; icon: typeof LayoutDashboard };
-
-const roleLabels: Record<PortalRole, string> = {
-  student: 'Student Portal',
-  staff: 'Staff / Faculty Portal',
-  admin: 'Admin Portal',
-  super_admin: 'Super Admin',
-};
-
-const roleDescriptions: Record<PortalRole, string> = {
-  student: 'Your classes, progress, and college life',
-  staff: 'Teaching, attendance, and student records',
-  admin: 'Academic operations and college administration',
-  super_admin: 'Full system control and governance',
-};
-
-const roleNavItems: Record<PortalRole, NavItem[]> = {
-  student: [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/courses', label: 'Course registration', icon: BookOpen },
-    { href: '/student/my-courses', label: 'My courses', icon: ClipboardList },
-    { href: '/student/class-schedule', label: 'Class schedule', icon: CalendarDays },
-    { href: '/results', label: 'Grades / results', icon: GraduationCap },
-    { href: '/student/transcript', label: 'Transcript', icon: FileChartColumn },
-    { href: '/finance', label: 'Fees & payments', icon: WalletCards },
-    { href: '/student/attendance', label: 'Attendance', icon: ClipboardCheck },
-    { href: '/student/assignments', label: 'Assignments', icon: ListChecks },
-    { href: '/announcements', label: 'Announcements', icon: Bell },
-    { href: '/student/notifications', label: 'Notifications', icon: Bell },
-    { href: '/student/profile', label: 'Student profile', icon: UserRound },
-    { href: '/documents', label: 'Download documents', icon: FileText },
-  ],
-  staff: [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/staff/assigned-courses', label: 'Assigned courses', icon: BookOpen },
-    { href: '/staff/class-lists', label: 'Class lists', icon: Users },
-    { href: '/staff/attendance', label: 'Attendance', icon: ClipboardCheck },
-    { href: '/staff/grade-submission', label: 'Grade submission', icon: GraduationCap },
-    { href: '/staff/course-materials', label: 'Course materials', icon: FileText },
-    { href: '/staff/student-records', label: 'Student records', icon: UserRound },
-    { href: '/announcements', label: 'Announcements', icon: Bell },
-  ],
-  admin: [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/students', label: 'Students', icon: Users },
-    { href: '/admin/staff', label: 'Staff', icon: UserRound },
-    { href: '/admin/departments', label: 'Departments', icon: Building2 },
-    { href: '/admin/programs', label: 'Programs', icon: GraduationCap },
-    { href: '/admin/courses', label: 'Courses', icon: BookOpen },
-    { href: '/admin/academic-periods', label: 'Academic years / semesters', icon: CalendarClock },
-    { href: '/admin/registration', label: 'Registration', icon: ClipboardList },
-    { href: '/admin/payments', label: 'Payments', icon: CreditCard },
-    { href: '/admin/results', label: 'Results', icon: FileChartColumn },
-    { href: '/admin/reports', label: 'Reports', icon: TrendingUp },
-    { href: '/announcements', label: 'Announcements', icon: Bell },
-  ],
-  super_admin: [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/students', label: 'Students', icon: Users },
-    { href: '/admin/staff', label: 'Staff', icon: UserRound },
-    { href: '/admin/departments', label: 'Departments', icon: Building2 },
-    { href: '/admin/programs', label: 'Programs', icon: GraduationCap },
-    { href: '/admin/courses', label: 'Courses', icon: BookOpen },
-    { href: '/admin/academic-periods', label: 'Academic years / semesters', icon: CalendarClock },
-    { href: '/admin/registration', label: 'Registration', icon: ClipboardList },
-    { href: '/admin/payments', label: 'Payments', icon: CreditCard },
-    { href: '/admin/results', label: 'Results', icon: FileChartColumn },
-    { href: '/admin/reports', label: 'Reports', icon: TrendingUp },
-    { href: '/super-admin/users', label: 'User / role management', icon: UserCog },
-    { href: '/super-admin/settings', label: 'System settings', icon: Settings },
-    { href: '/super-admin/permissions', label: 'Permissions', icon: SlidersHorizontal },
-    { href: '/super-admin/audit-logs', label: 'Audit logs', icon: ScrollText },
-    { href: '/super-admin/system', label: 'Database / system management', icon: Database },
-    { href: '/announcements', label: 'Announcements', icon: Bell },
-  ],
-};
-
-const formatCurrency = (amount?: number) =>
-  typeof amount === 'number'
-    ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
-    : '—';
-
-const formatDate = (value?: string) => {
-  if (!value) return '—';
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf())
-    ? value
-    : new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
-};
-
-const titleCase = (value: string) => value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
-
-function LogoLockup({ compact = false, inverse = false }: { compact?: boolean; inverse?: boolean }) {
   return (
-    <div className="flex items-center gap-3" data-testid="brand-lockup">
-      <div className={`flex shrink-0 items-center justify-center rounded-xl bg-white ${compact ? 'h-10 w-10 p-1.5' : 'h-14 w-14 p-2'}`}>
-        <img src={lccLogo} alt="Liberia Christian College" className="h-full w-full object-contain" data-testid="img-lcc-logo" />
-      </div>
-      {!compact && (
-        <div className="min-w-0">
-          <div className={`display-font text-[15px] font-bold leading-none ${inverse ? 'text-primary-foreground' : 'text-sidebar-foreground'}`}>Liberia Christian</div>
-          <div className={`mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${inverse ? 'text-primary-foreground/65' : 'text-sidebar-foreground/65'}`}>College E-Portal</div>
+    <section className="mb-8 rounded-[1.5rem] border border-border bg-card p-3 shadow-sm sm:p-4" data-testid="section-home-flyers" aria-label={`${roleLabels[role]} announcements`}>
+      <div className="mb-3 flex items-end justify-between gap-4 px-1 sm:px-2">
+        <div>
+          <p className="eyebrow text-primary">LCC updates</p>
+          <h2 className="display-font mt-1 text-xl font-bold sm:text-2xl">What’s happening on campus</h2>
         </div>
-      )}
-    </div>
-  );
-}
-
-function SkeletonBlock({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded-lg bg-muted ${className}`} aria-hidden="true" />;
-}
-
-function QueryState({
-  loading,
-  error,
-  empty,
-  onRetry,
-}: {
-  loading?: boolean;
-  error?: boolean;
-  empty?: boolean;
-  onRetry?: () => void;
-}) {
-  if (loading) {
-    return (
-      <div className="space-y-3" data-testid="state-loading">
-        <SkeletonBlock className="h-20 w-full" />
-        <SkeletonBlock className="h-20 w-full" />
-        <SkeletonBlock className="h-20 w-full" />
+        <p className="hidden text-right text-xs font-semibold text-muted-foreground sm:block">Swipe or choose a flyer</p>
       </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-destructive/25 bg-destructive/5 px-5 py-8 text-center" data-testid="state-error">
-        <CircleHelp className="mx-auto mb-3 h-8 w-8 text-destructive" />
-        <h3 className="display-font text-lg font-semibold">We could not load this yet</h3>
-        <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Please check your connection and try again. Your portal data is safe.</p>
-        {onRetry && <button onClick={onRetry} className="focus-ring mt-5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground interactive" data-testid="button-retry">Try again</button>}
-      </div>
-    );
-  }
-  if (empty) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border bg-card/60 px-5 py-12 text-center" data-testid="state-empty">
-        <FileText className="mx-auto mb-3 h-8 w-8 text-muted-foreground/60" />
-        <h3 className="display-font text-lg font-semibold">Nothing here yet</h3>
-        <p className="mt-1 text-sm text-muted-foreground">When there is something to show, it will appear in this space.</p>
-      </div>
-    );
-  }
-  return null;
-}
-
-function Sidebar({ user, onLogout, onClose }: { user: User; onLogout: () => void; onClose?: () => void }) {
-  const [location] = useLocation();
-  const visibleNavItems = roleNavItems[user.role] ?? roleNavItems.student;
-  const getNavSection = (item: NavItem) => {
-    if (item.href === '/dashboard') return 'Overview';
-    if (item.href.includes('announcement') || item.href.includes('notification')) return 'Updates';
-    if (item.href === '/support' || item.href === '/verify') return 'Services';
-    if (user.role === 'student') {
-      if (item.href === '/finance' || item.href === '/documents' || item.href.includes('/profile')) return 'Services';
-      return 'Academics';
-    }
-    if (user.role === 'staff') return 'Teaching';
-    if (user.role === 'admin' || user.role === 'super_admin') return item.href.includes('super-admin') ? 'System governance' : 'Administration';
-    return 'Workspace';
-  };
-  return (
-    <aside className="flex h-full w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 text-sidebar-foreground" data-testid="sidebar">
-      <div className="px-3 pb-7"><LogoLockup /></div>
-      <div className="mb-4 rounded-xl bg-sidebar-accent/60 px-3 py-3" data-testid="card-role-context">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-primary">{roleLabels[user.role]}</p>
-        <p className="mt-1 text-xs leading-5 text-sidebar-foreground/60">{roleDescriptions[user.role]}</p>
-      </div>
-      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1" aria-label={`${roleLabels[user.role]} navigation`}>
-        {visibleNavItems.map((item, index) => {
-          const active = location === item.href;
-          const Icon = item.icon ?? LayoutDashboard;
-          return (
-            <div key={item.href}>
-              {(index === 0 || getNavSection(item) !== getNavSection(visibleNavItems[index - 1])) && <p className="mb-2 mt-5 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground first:mt-0">{getNavSection(item)}</p>}
-              <Link
-                href={item.href}
-                onClick={onClose}
-                aria-current={active ? 'page' : undefined}
-                className={`focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors ${active ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' : 'text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
-                data-testid={`link-nav-${item.label.toLowerCase()}`}
-              >
-                <Icon className="h-[18px] w-[18px]" />
-                <span>{item.label}</span>
-                {(item.label === 'Announcements' || item.label === 'Notifications') && <span className="ml-auto h-2 w-2 rounded-full bg-sidebar-primary" aria-label="Unread updates" data-testid={`indicator-unread-${item.label.toLowerCase().replaceAll(' ', '-')}`} />}
-              </Link>
+      <div className="relative overflow-hidden rounded-[1.1rem] bg-muted">
+        <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
+          {homeFlyers.map((flyer) => (
+            <div className="min-w-full" key={flyer.src}>
+              <img src={flyer.src} alt={flyer.alt} className="block aspect-[3/1] w-full object-cover" />
             </div>
-          );
-        })}
-      </nav>
-      <div className="mt-auto space-y-2 pt-8">
-        <Link href="/support" onClick={onClose} className="focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="link-nav-support">
-          <Headphones className="h-[18px] w-[18px]" /><span>Support desk</span>
-        </Link>
-        <Link href="/verify" onClick={onClose} className="focus-ring flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="link-nav-verify">
-          <ShieldCheck className="h-[18px] w-[18px]" /><span>Verify a document</span>
-        </Link>
-        <div className="my-4 h-px bg-sidebar-border" />
-        <div className="flex items-center gap-3 rounded-xl bg-sidebar-accent/60 p-3" data-testid="card-sidebar-user">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-xs font-bold text-sidebar-primary-foreground" data-testid="avatar-sidebar">{user.avatarInitials || 'LC'}</div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">{user.name}</p>
-            <p className="truncate text-[11px] text-sidebar-foreground/55">{titleCase(user.role)}</p>
-          </div>
-          <button onClick={onLogout} aria-label="Sign out" className="focus-ring rounded-lg p-2 text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground" data-testid="button-logout">
-            <LogOut className="h-4 w-4" />
-          </button>
+          ))}
         </div>
+        <button type="button" onClick={() => selectSlide(activeIndex - 1)} aria-label="Previous flyer" className="focus-ring absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white" data-testid="button-flyer-previous">
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button type="button" onClick={() => selectSlide(activeIndex + 1)} aria-label="Next flyer" className="focus-ring absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white" data-testid="button-flyer-next">
+          <ChevronRight className="h-5 w-5" />
+        </button>
       </div>
-    </aside>
-  );
-}
-
-function AppShell({ children }: { children: ReactNode }) {
-  const [, setLocation] = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const currentUserQuery = useGetCurrentUser();
-  const logout = useLogout();
-  const user = currentUserQuery.data ?? fallbackUser;
-
-  const handleLogout = () => {
-    logout.mutate(undefined, { onSettled: () => setLocation('/') });
-  };
-
-  const submitSearch = (event: FormEvent) => {
-    event.preventDefault();
-    if (search.trim()) setLocation(`/announcements?search=${encodeURIComponent(search.trim())}`);
-  };
-
-  return (
-    <div className="portal-shell flex h-[100dvh] w-full overflow-hidden text-foreground">
-      <div className={`fixed inset-0 z-40 bg-primary/30 backdrop-blur-sm transition-opacity md:hidden ${mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`} onClick={() => setMobileOpen(false)} aria-hidden="true" />
-      <div className={`fixed inset-y-0 left-0 z-50 transform transition-transform md:relative md:z-0 md:flex ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-        <Sidebar user={user} onLogout={handleLogout} onClose={() => setMobileOpen(false)} />
+      <div className="flex items-center justify-center gap-2 pt-3" role="tablist" aria-label="Choose campus flyer">
+        {homeFlyers.map((flyer, index) => (
+          <button
+            type="button"
+            key={flyer.src}
+            role="tab"
+            aria-selected={activeIndex === index}
+            aria-label={`Show flyer ${index + 1}`}
+            onClick={() => selectSlide(index)}
+            className={`focus-ring h-2.5 rounded-full transition-all ${activeIndex === index ? 'w-7 bg-[#ff6200]' : 'w-2.5 bg-primary/25 hover:bg-primary/50'}`}
+            data-testid={`button-flyer-dot-${index}`}
+          />
+        ))}
       </div>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-border/70 bg-background/85 px-4 backdrop-blur-xl sm:px-6 lg:px-10" data-testid="topbar">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="focus-ring rounded-lg p-2 md:hidden" aria-label="Open menu" data-testid="button-open-menu"><Menu className="h-5 w-5" /></button>
-            <div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex"><span className="h-2 w-2 rounded-full bg-secondary-foreground" /><span>Monrovia campus</span></div>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <form onSubmit={submitSearch} className="hidden items-center rounded-xl border border-input bg-card px-3 py-2 sm:flex" data-testid="form-global-search">
-              <Search className="mr-2 h-4 w-4 text-muted-foreground" />
-              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search announcements" className="w-32 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70 lg:w-44" aria-label="Search announcements" data-testid="input-global-search" />
-            </form>
-            <Link href="/announcements" className="focus-ring relative rounded-xl border border-transparent p-2.5 text-muted-foreground hover:border-border hover:bg-card hover:text-foreground" aria-label="Open announcements" data-testid="link-topbar-announcements">
-              <Bell className="h-[18px] w-[18px]" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-accent" />
-            </Link>
-            <div className="hidden h-8 w-px bg-border sm:block" />
-            <div className="flex items-center gap-2" data-testid="topbar-user">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">{user.avatarInitials || 'LC'}</div>
-              <div className="hidden leading-tight lg:block"><p className="text-sm font-semibold">{user.name}</p><p className="text-[11px] text-muted-foreground">{user.identifier}</p></div>
-              <ChevronDown className="hidden h-4 w-4 text-muted-foreground lg:block" />
-            </div>
-          </div>
-        </header>
-        <main className="paper-grid min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
-      </div>
-    </div>
-  );
-}
-
-function PageHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description?: string; action?: ReactNode }) {
-  return (
-    <div className="mb-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-      <div><p className="eyebrow">{eyebrow}</p><h1 className="display-font mt-2 text-3xl font-bold tracking-[-0.035em] text-foreground sm:text-4xl" data-testid="heading-page">{title}</h1>{description && <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p>}</div>
-      {action}
-    </div>
+    </section>
   );
 }
 
@@ -377,6 +50,7 @@ function DashboardPage() {
   const userQuery = useGetCurrentUser();
   const dashboard = dashboardQuery.data;
   const metrics = dashboard?.metrics ?? [];
+  const role = dashboard?.role ?? userQuery.data?.role ?? 'student';
   return (
     <div className="page-in mx-auto max-w-[1440px]" data-testid="page-dashboard">
       <div className="mb-8 grid gap-6 overflow-hidden rounded-[1.5rem] bg-primary p-6 text-primary-foreground shadow-lg sm:p-8 lg:grid-cols-[1fr_auto] lg:p-10">
@@ -388,6 +62,7 @@ function DashboardPage() {
         </div>
          <div className="relative hidden min-w-[190px] items-end justify-end lg:flex"><div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10"><Sparkles className="h-8 w-8 text-accent" /></div></div>
       </div>
+      {(role === 'student' || role === 'staff') && <HomeFlyerCarousel role={role} />}
       <QueryState loading={dashboardQuery.isLoading} error={!!dashboardQuery.error} onRetry={() => void dashboardQuery.refetch()} />
       {!dashboardQuery.isLoading && !dashboardQuery.error && (
         <>
@@ -763,39 +438,62 @@ function LoginPage() {
   const [, setLocation] = useLocation();
   const client = useQueryClient();
   const login = useLogin();
-  const [email, setEmail] = useState('');
+  const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    login.mutate({ data: { email, password, rememberMe } }, { onSuccess: (session) => { client.setQueryData(getGetCurrentUserQueryKey(), session.user); setLocation('/dashboard'); } });
+    login.mutate({ data: { login: loginId, password, rememberMe } }, { onSuccess: (session) => { client.setQueryData(getGetCurrentUserQueryKey(), session.user); setLocation('/dashboard'); } });
   };
   return (
     <div className="flex h-[100dvh] overflow-hidden bg-background text-foreground" data-testid="page-login">
-      <div className="hidden h-full w-[44%] flex-col justify-between bg-primary p-10 text-primary-foreground lg:flex">
+      <div className="relative hidden h-full w-[44%] flex-col justify-between overflow-hidden bg-primary p-10 text-primary-foreground lg:flex">
+        <div className="pointer-events-none absolute -right-24 top-1/3 h-80 w-80 rounded-full bg-accent/15 blur-3xl" />
         <LogoLockup inverse />
-        <div className="max-w-lg pb-8">
-          <p className="eyebrow text-accent">Daily academic home</p>
-          <h1 className="display-font mt-5 text-6xl font-bold leading-[.98] tracking-[-.06em]">Keep your calling<br /><span className="text-accent">in order.</span></h1>
-          <p className="mt-6 max-w-md text-base leading-7 text-primary-foreground/65">Your classes, results, fees, and official records — close at hand, wherever your LCC day takes you.</p>
-          <div className="mt-10 flex items-center gap-3 text-xs font-semibold text-primary-foreground/55"><span className="h-px w-10 bg-accent" /> Monrovia · Liberia <span className="h-px w-10 bg-accent" /></div>
+        <div className="relative flex flex-1 items-center justify-center overflow-hidden" aria-hidden="true">
+          <div className="absolute h-72 w-72 rounded-full border border-primary-foreground/15" />
+          <div className="absolute h-52 w-52 rounded-full border border-accent/50" />
+          <div className="h-24 w-24 rotate-45 rounded-[2rem] bg-accent shadow-2xl shadow-black/20" />
         </div>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/55">Monrovia · Liberia</p>
       </div>
-      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-background px-5 py-4 text-foreground sm:px-10 sm:py-6">
-        <div className="w-full max-w-[420px]">
-          <div className="mb-6 lg:hidden"><LogoLockup compact /></div>
-          <p className="eyebrow">Welcome back</p>
-          <h2 className="display-font mt-2 text-3xl font-bold tracking-[-.04em] sm:text-4xl">Sign in to E-Portal</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">Use your LCC email to continue to your academic home.</p>
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#f7f6f9] px-4 py-4 text-foreground sm:px-8 lg:px-12">
+        <div className="w-full max-w-[460px] rounded-[1.75rem] border border-border/80 bg-card/95 p-5 shadow-xl shadow-primary/5 sm:p-9">
+          <div className="mb-7 flex items-center justify-between gap-4 lg:hidden">
+            <LogoLockup onLight />
+            <span className="rounded-full bg-secondary px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-secondary-foreground">Secure access</span>
+          </div>
+          <div className="hidden items-center justify-between gap-4 lg:flex">
+            <div>
+              <p className="eyebrow text-primary">LCC E-Portal</p>
+              <h2 className="display-font mt-2 text-4xl font-bold tracking-[-.05em]">Sign in</h2>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground"><LockKeyhole className="h-5 w-5" /></div>
+          </div>
+          <div className="lg:hidden">
+            <h2 className="display-font text-3xl font-bold tracking-[-.04em]">Sign in</h2>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Use your LCC user ID or username to continue.</p>
           <form onSubmit={submit} className="mt-6 space-y-4">
-            <label className="block"><span className="mb-2 block text-sm font-semibold">LCC email</span><input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@lcc.edu.lr" className="min-h-11 w-full rounded-xl border border-input bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="input-login-email" /></label>
-            <label className="block"><span className="mb-2 block text-sm font-semibold">Password</span><input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="min-h-11 w-full rounded-xl border border-input bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="input-login-password" /></label>
-            <div className="flex items-center justify-between gap-3"><label className="flex items-center gap-2 text-sm text-muted-foreground"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded accent-primary" data-testid="input-login-remember" /> Remember me</label><span className="text-xs font-semibold text-secondary-foreground">Need help? Visit Support</span></div>
-            {login.error && <p className="rounded-lg bg-destructive/10 p-3 text-sm font-medium text-destructive" data-testid="status-login-error">The email or password was not recognized. Try again.</p>}
-            <button disabled={login.isPending} className="focus-ring flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-60" data-testid="button-login-submit">{login.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Continue to portal <ArrowRight className="h-4 w-4" /></>}</button>
+            <label className="block">
+              <span className="mb-2 block text-sm font-semibold">User ID or username</span>
+              <div className="relative">
+                <UserRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input required type="text" autoComplete="username" value={loginId} onChange={(event) => setLoginId(event.target.value)} placeholder="e.g. LCC-2024-0187" className="min-h-12 w-full rounded-xl border border-input bg-background pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20" data-testid="input-login-user-id" />
+              </div>
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-sm font-semibold">Password</span>
+              <div className="relative">
+                <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="min-h-12 w-full rounded-xl border border-input bg-background pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20" data-testid="input-login-password" />
+              </div>
+            </label>
+            <label className="flex items-center gap-2 pt-1 text-sm text-muted-foreground"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded accent-primary" data-testid="input-login-remember" /> Remember me</label>
+            {login.error && <p className="rounded-lg bg-destructive/10 p-3 text-sm font-medium text-destructive" data-testid="status-login-error">The user ID, username, or password was not recognized.</p>}
+            <button disabled={login.isPending} className="focus-ring flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition hover:brightness-110 disabled:opacity-60" data-testid="button-login-submit">{login.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Continue to portal <ArrowRight className="h-4 w-4" /></>}</button>
           </form>
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5" /> Secure access for LCC students and staff</div>
-          <Link href="/verify" className="mt-3 block text-center text-xs font-bold text-secondary-foreground underline-offset-4 hover:underline" data-testid="link-login-verify">Verify an official document without signing in</Link>
+          <Link href="/verify" className="mt-5 block text-center text-xs font-bold text-secondary-foreground underline-offset-4 hover:underline" data-testid="link-login-verify">Verify a document without signing in</Link>
         </div>
       </div>
     </div>
