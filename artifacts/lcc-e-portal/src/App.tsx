@@ -1,5 +1,5 @@
 import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from 'react';
-import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   useCreateSupportTicket,
   useGetCurrentUser,
@@ -9,7 +9,6 @@ import {
   useListCourses,
   useListDocuments,
   useListResults,
-  useCreateCourse,
   useLogin,
   useLogout,
   useRegisterCourse,
@@ -603,6 +602,34 @@ const emptyCourseDraft: CourseDraft = {
   room: '',
   accent: 'blue',
 };
+
+type CreateCourseInput = {
+  code: string;
+  title: string;
+  instructor?: string;
+  credits: number;
+  schedule: string;
+  room: string;
+  accent: CourseDraft['accent'];
+};
+
+function useCreateCourse() {
+  return useMutation<Course, Error, { data: CreateCourseInput }>({
+    mutationFn: async ({ data }) => {
+      const response = await fetch('/api/courses', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || 'The course could not be added.');
+      }
+      return (await response.json()) as Course;
+    },
+  });
+}
 
 function CourseManagementPage() {
   const coursesQuery = useListCourses();
