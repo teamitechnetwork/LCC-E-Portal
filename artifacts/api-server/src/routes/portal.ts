@@ -439,6 +439,41 @@ router.get("/courses", requireRole(["student"], async (req, res, user) => {
   res.json(ListCoursesResponse.parse(data));
 }));
 
+router.post("/courses", requireRole(["staff", "admin", "super_admin"], async (req, res) => {
+  const body = (req.body || {}) as Record<string, unknown>;
+  const code = typeof body.code === "string" ? body.code.trim().toUpperCase() : "";
+  const title = typeof body.title === "string" ? body.title.trim() : "";
+  const instructor = typeof body.instructor === "string" ? body.instructor.trim() : "";
+  const schedule = typeof body.schedule === "string" ? body.schedule.trim() : "";
+  const room = typeof body.room === "string" ? body.room.trim() : "";
+  const credits = typeof body.credits === "number" ? body.credits : Number(body.credits);
+  const accent = typeof body.accent === "string" ? body.accent : "blue";
+  const validAccents = new Set(["blue", "gold", "purple", "green"]);
+
+  if (!code || !title || !instructor || !schedule || !room || !Number.isInteger(credits) || credits < 1 || credits > 12 || !validAccents.has(accent)) {
+    res.status(400).json({ error: "Please provide valid course details." });
+    return;
+  }
+
+  const [existing] = await db.select({ id: portalCoursesTable.id }).from(portalCoursesTable).where(eq(portalCoursesTable.code, code)).limit(1);
+  if (existing) {
+    res.status(409).json({ error: "A course with this code already exists." });
+    return;
+  }
+
+  const [course] = await db.insert(portalCoursesTable).values({
+    id: `course-${crypto.randomUUID()}`,
+    code,
+    title,
+    instructor,
+    credits,
+    schedule,
+    room,
+    accent,
+  }).returning();
+
+  res.status(201).json({ ...course, credits: Number(course.credits), status: "available" });
+}));
 router.post("/courses/:courseId/register", requireRole(["student"], async (req, res, user) => {
   const params = RegisterCourseParams.parse(req.params);
   const [course] = await db.select().from(portalCoursesTable).where(eq(portalCoursesTable.id, params.courseId)).limit(1);
