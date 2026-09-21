@@ -9,6 +9,7 @@ import {
   useListCourses,
   useListDocuments,
   useListResults,
+  useCreateCourse,
   useLogin,
   useLogout,
   useRegisterCourse,
@@ -128,6 +129,8 @@ const roleNavItems: Record<PortalRole, NavItem[]> = {
     { href: '/student/assignments', label: 'Assignments', icon: ListChecks, section: 'Services' },
     { href: '/documents', label: 'Download documents', icon: FileText, section: 'Services' },
     { href: '/student/profile', label: 'Student profile', icon: UserRound, section: 'Services' },
+    { href: '/support', label: 'Support desk', icon: Headphones, section: 'Services' },
+    { href: '/verify', label: 'Verify a document', icon: ShieldCheck, section: 'Services' },
     { href: '/finance', label: 'Fees & payments', icon: WalletCards, section: 'Finance' },
     { href: '/announcements', label: 'Announcements', icon: Bell, section: 'Updates' },
     { href: '/student/notifications', label: 'Notifications', icon: Bell, section: 'Updates' },
@@ -140,6 +143,8 @@ const roleNavItems: Record<PortalRole, NavItem[]> = {
     { href: '/staff/grade-submission', label: 'Grade submission', icon: GraduationCap, section: 'Teaching' },
     { href: '/staff/course-materials', label: 'Course materials', icon: FileText, section: 'Teaching' },
     { href: '/staff/student-records', label: 'Student records', icon: UserRound, section: 'People' },
+    { href: '/support', label: 'Support desk', icon: Headphones, section: 'Services' },
+    { href: '/verify', label: 'Verify a document', icon: ShieldCheck, section: 'Services' },
     { href: '/announcements', label: 'Announcements', icon: Bell, section: 'Updates' },
   ],
   admin: [
@@ -154,6 +159,8 @@ const roleNavItems: Record<PortalRole, NavItem[]> = {
     { href: '/admin/results', label: 'Results', icon: FileChartColumn, section: 'Academics' },
     { href: '/admin/payments', label: 'Payments', icon: CreditCard, section: 'Finance' },
     { href: '/admin/reports', label: 'Reports', icon: TrendingUp, section: 'Insights' },
+    { href: '/support', label: 'Support desk', icon: Headphones, section: 'Services' },
+    { href: '/verify', label: 'Verify a document', icon: ShieldCheck, section: 'Services' },
     { href: '/announcements', label: 'Announcements', icon: Bell, section: 'Updates' },
   ],
   super_admin: [
@@ -173,6 +180,8 @@ const roleNavItems: Record<PortalRole, NavItem[]> = {
     { href: '/super-admin/permissions', label: 'Permissions', icon: SlidersHorizontal, section: 'Governance' },
     { href: '/super-admin/audit-logs', label: 'Audit logs', icon: ScrollText, section: 'Governance' },
     { href: '/super-admin/system', label: 'Database / system management', icon: Database, section: 'Governance' },
+    { href: '/support', label: 'Support desk', icon: Headphones, section: 'Services' },
+    { href: '/verify', label: 'Verify a document', icon: ShieldCheck, section: 'Services' },
     { href: '/announcements', label: 'Announcements', icon: Bell, section: 'Updates' },
   ],
 };
@@ -220,6 +229,33 @@ function LogoLockup({ compact = false, inverse = false, onLight = false, large =
         </div>
       )}
     </div>
+  );
+}
+
+function BrandCredit({ className = '' }: { className?: string }) {
+  return (
+    <p className={`brand-credit ${className}`}>
+      © 2026 LCC <span aria-hidden="true">•</span> Technology by{' '}
+      <a href="https://www.itechnetworkafrica.com" target="_blank" rel="noreferrer" className="brand-credit__link" data-testid="link-itech-credit">
+        iTech Network Africa
+      </a>
+    </p>
+  );
+}
+
+function PortalPreloader() {
+  return (
+    <main className="portal-preloader" aria-label="Loading LCC E-Portal" aria-live="polite" data-testid="portal-preloader">
+      <div className="portal-preloader__content">
+        <p className="portal-preloader__wordmark">LCC E-PORTAL</p>
+        <div className="portal-preloader__dots" aria-hidden="true">
+          <span className="portal-preloader__dot portal-preloader__dot--gold" />
+          <span className="portal-preloader__dot portal-preloader__dot--purple" />
+          <span className="portal-preloader__dot portal-preloader__dot--blue" />
+        </div>
+      </div>
+      <BrandCredit className="portal-preloader__credit" />
+    </main>
   );
 }
 
@@ -273,14 +309,14 @@ function Sidebar({ user, onLogout, onClose }: { user: User; onLogout: () => void
   const [location] = useLocation();
   const visibleNavItems = roleNavItems[user.role] ?? roleNavItems.student;
   return (
-    <aside className="flex h-full w-[280px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 text-sidebar-foreground shadow-[4px_0_20px_rgba(45,25,70,0.04)]" data-testid="sidebar">
-      <div className="px-3 pb-6"><LogoLockup /></div>
-      <div className="mb-5 rounded-2xl border border-sidebar-border bg-sidebar-accent/55 px-4 py-3.5" data-testid="card-role-context">
+    <aside className="flex h-full w-[272px] shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar px-4 py-5 text-sidebar-foreground shadow-[4px_0_20px_rgba(45,25,70,0.04)]" data-testid="sidebar">
+      <div className="shrink-0 px-3 pb-5"><LogoLockup /></div>
+      <div className="mb-4 shrink-0 rounded-2xl border border-sidebar-border bg-sidebar-accent/55 px-4 py-3.5" data-testid="card-role-context">
         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-primary">Signed in as</p>
         <p className="mt-1 text-sm font-bold text-sidebar-accent-foreground">{roleLabels[user.role]}</p>
         <p className="mt-1 text-xs leading-5 text-sidebar-foreground/60">{roleDescriptions[user.role]}</p>
       </div>
-      <nav className="min-h-0 flex-1 space-y-6 overflow-y-auto pr-1" aria-label={`${roleLabels[user.role]} navigation`}>
+      <nav className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pr-1" aria-label={`${roleLabels[user.role]} navigation`}>
         {visibleNavItems.map((item, index) => {
           const active = location === item.href;
           const Icon = item.icon ?? LayoutDashboard;
@@ -302,15 +338,8 @@ function Sidebar({ user, onLogout, onClose }: { user: User; onLogout: () => void
           );
         })}
       </nav>
-      <div className="mt-auto space-y-2 pt-8">
-        <p className="px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-foreground/45">Quick access</p>
-        <Link href="/support" onClick={onClose} className="focus-ring group flex min-h-11 items-center gap-3 rounded-xl border border-transparent px-3 text-sm font-semibold text-sidebar-foreground/70 hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="link-nav-support">
-          <Headphones className="h-[18px] w-[18px] text-sidebar-primary/75 group-hover:text-sidebar-primary" /><span>Support desk</span>
-        </Link>
-        <Link href="/verify" onClick={onClose} className="focus-ring group flex min-h-11 items-center gap-3 rounded-xl border border-transparent px-3 text-sm font-semibold text-sidebar-foreground/70 hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-testid="link-nav-verify">
-          <ShieldCheck className="h-[18px] w-[18px] text-sidebar-primary/75 group-hover:text-sidebar-primary" /><span>Verify a document</span>
-        </Link>
-        <div className="my-4 h-px bg-sidebar-border" />
+      <BrandCredit className="brand-credit--sidebar shrink-0 px-3 py-3" />
+      <div className="mt-4 shrink-0 border-t border-sidebar-border pt-4">
         <div className="flex items-center gap-3 rounded-2xl border border-sidebar-border bg-sidebar-accent/45 p-3" data-testid="card-sidebar-user">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-xs font-bold text-sidebar-primary-foreground" data-testid="avatar-sidebar">{user.avatarInitials || 'LC'}</div>
           <div className="min-w-0 flex-1">
@@ -330,17 +359,28 @@ function AppShell({ children }: { children: ReactNode }) {
   const [, setLocation] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [profileOpen, setProfileOpen] = useState(false);
   const currentUserQuery = useGetCurrentUser();
   const logout = useLogout();
   const user = currentUserQuery.data ?? fallbackUser;
 
-  const handleLogout = () => {
-    logout.mutate(undefined, { onSettled: () => setLocation('/') });
-  };
-
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
     if (search.trim()) setLocation(`/announcements?search=${encodeURIComponent(search.trim())}`);
+  };
+
+  const profileHref =
+    user.role === 'student'
+      ? '/student/profile'
+      : user.role === 'staff'
+        ? '/staff/student-records'
+        : user.role === 'admin'
+          ? '/admin/staff'
+          : '/super-admin/settings';
+
+  const handleLogout = () => {
+    setProfileOpen(false);
+    logout.mutate(undefined, { onSettled: () => setLocation('/') });
   };
 
   return (
@@ -360,11 +400,36 @@ function AppShell({ children }: { children: ReactNode }) {
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
               <div className="hidden text-right leading-tight sm:block"><p className="text-sm font-semibold">Hi, {user.name.split(' ')[0] || 'there'}!</p><p className="mt-1 text-[11px] text-white/65">{roleLabels[user.role]}</p></div>
-              <Link href="/announcements" className="focus-ring relative rounded-xl p-2.5 text-white/85 hover:bg-white/10" aria-label="Open announcements" data-testid="link-topbar-announcements">
+               <Link href="/announcements" className="focus-ring relative rounded-xl p-2.5 text-white/85 hover:bg-white/10" aria-label="Open announcements" data-testid="link-topbar-announcements">
                 <Bell className="h-[18px] w-[18px]" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#ff6200]" />
               </Link>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/85 bg-white/15 text-xs font-bold text-white" data-testid="topbar-user">{user.avatarInitials || 'LC'}</div>
-              <ChevronDown className="hidden h-4 w-4 text-white/70 lg:block" />
+               <div className="relative">
+                 <button
+                   type="button"
+                   onClick={() => setProfileOpen((open) => !open)}
+                   className="focus-ring flex items-center gap-2 rounded-xl p-1.5 text-white hover:bg-white/10"
+                   aria-label="Open account menu"
+                   aria-expanded={profileOpen}
+                   data-testid="button-topbar-account"
+                 >
+                   <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/85 bg-white/15 text-xs font-bold text-white" data-testid="topbar-user">{user.avatarInitials || 'LC'}</span>
+                   <ChevronDown className={`hidden h-4 w-4 text-white/70 transition-transform lg:block ${profileOpen ? 'rotate-180' : ''}`} />
+                 </button>
+                 {profileOpen && (
+                   <div className="absolute right-0 top-14 z-50 w-64 rounded-2xl border border-border bg-card p-2 text-foreground shadow-xl" data-testid="menu-topbar-account">
+                     <div className="border-b border-border px-3 py-2">
+                       <p className="truncate text-sm font-bold">{user.name}</p>
+                       <p className="mt-1 truncate text-xs text-muted-foreground">{user.email || roleLabels[user.role]}</p>
+                     </div>
+                     <Link href={profileHref} onClick={() => setProfileOpen(false)} className="focus-ring mt-1 flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold hover:bg-muted" data-testid="link-topbar-profile">
+                       <UserRound className="h-4 w-4 text-secondary-foreground" /> Account details
+                     </Link>
+                     <button type="button" onClick={handleLogout} className="focus-ring flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-destructive hover:bg-destructive/10" data-testid="button-topbar-logout">
+                       <LogOut className="h-4 w-4" /> Sign out
+                     </button>
+                   </div>
+                 )}
+               </div>
             </div>
           </div>
           <form onSubmit={submitSearch} className="mt-3 flex min-h-12 items-center rounded-xl bg-white px-3 text-slate-700 shadow-sm sm:max-w-xl" data-testid="form-global-search">
@@ -516,6 +581,126 @@ function CourseCard({ course, onRegister, pending }: { course: Course; onRegiste
     <article className="interactive overflow-hidden rounded-2xl border border-border bg-card shadow-xs" data-testid={`card-course-${course.id}`}>
       <div className={`h-2 ${accent}`} /><div className="p-5"><div className="flex items-start justify-between gap-3"><div><p className="mono-font text-xs font-bold tracking-wide text-muted-foreground">{course.code}</p><h2 className="display-font mt-2 text-xl font-bold leading-tight">{course.title}</h2></div><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${course.status === 'registered' ? 'bg-secondary text-secondary-foreground' : course.status === 'completed' ? 'bg-muted text-muted-foreground' : 'bg-accent/35 text-accent-foreground'}`} data-testid={`status-course-${course.id}`}>{titleCase(course.status)}</span></div><div className="mt-6 space-y-2.5 text-sm text-muted-foreground"><div className="flex gap-3"><UserRound className="h-4 w-4 shrink-0 text-secondary-foreground" /><span>{course.instructor}</span></div><div className="flex gap-3"><CalendarDays className="h-4 w-4 shrink-0 text-secondary-foreground" /><span>{course.schedule}</span></div><div className="flex gap-3"><BookOpen className="h-4 w-4 shrink-0 text-secondary-foreground" /><span>{course.room} · {course.credits} credits</span></div></div>{course.status === 'available' && <button onClick={onRegister} disabled={pending} className="focus-ring mt-6 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-60" data-testid={`button-register-course-${course.id}`}>{pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><span>Register course</span><ArrowRight className="h-4 w-4" /></>}</button>}</div>
     </article>
+  );
+}
+
+type CourseDraft = {
+  code: string;
+  title: string;
+  instructor: string;
+  credits: string;
+  schedule: string;
+  room: string;
+  accent: 'blue' | 'gold' | 'purple' | 'green';
+};
+
+const emptyCourseDraft: CourseDraft = {
+  code: '',
+  title: '',
+  instructor: '',
+  credits: '3',
+  schedule: '',
+  room: '',
+  accent: 'blue',
+};
+
+function CourseManagementPage() {
+  const coursesQuery = useListCourses();
+  const createCourse = useCreateCourse();
+  const client = useQueryClient();
+  const userQuery = useGetCurrentUser();
+  const user = userQuery.data ?? fallbackUser;
+  const isStaff = user.role === 'staff';
+  const isSuperAdmin = user.role === 'super_admin';
+  const [draft, setDraft] = useState<CourseDraft>(emptyCourseDraft);
+  const [createdCourse, setCreatedCourse] = useState<string | null>(null);
+  const courses = coursesQuery.data ?? [];
+  const workspace = isStaff
+    ? {
+        eyebrow: 'Faculty workspace',
+        title: 'Assigned courses',
+        description: 'Create and maintain the courses you teach, then keep the current teaching plan easy to review.',
+        formDescription: 'New courses are saved to the academic catalog under your faculty account.',
+        listTitle: 'Your course list',
+      }
+    : {
+        eyebrow: isSuperAdmin ? 'System governance' : 'Academic administration',
+        title: 'Course catalog',
+        description: 'Maintain course codes, instructors, schedules, rooms, and availability for the LCC academic catalog.',
+        formDescription: 'Add a catalog course and assign it to the faculty member responsible for teaching it.',
+        listTitle: 'Catalog courses',
+      };
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    setCreatedCourse(null);
+    createCourse.mutate(
+      {
+        data: {
+          code: draft.code.trim().toUpperCase(),
+          title: draft.title.trim(),
+          instructor: isStaff ? undefined : draft.instructor.trim(),
+          credits: Number(draft.credits),
+          schedule: draft.schedule.trim(),
+          room: draft.room.trim(),
+          accent: draft.accent,
+        },
+      },
+      {
+        onSuccess: (course) => {
+          setCreatedCourse(course.code);
+          setDraft(emptyCourseDraft);
+          void client.invalidateQueries({ queryKey: getListCoursesQueryKey() });
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="page-in mx-auto max-w-[1280px]" data-testid="page-course-management">
+      <PageHeading
+        eyebrow={workspace.eyebrow}
+        title={workspace.title}
+        description={workspace.description}
+        action={<Link href={isStaff ? '/staff/class-lists' : '/admin/registration'} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-bold interactive" data-testid="link-course-management-next"><Users className="h-4 w-4 text-secondary-foreground" /> {isStaff ? 'View class lists' : 'View registration'}</Link>}
+      />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,.82fr)_minmax(0,1.18fr)]">
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-7" data-testid="section-create-course">
+          <div className="mb-6 flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground"><BookOpen className="h-5 w-5" /></div>
+            <div>
+              <p className="eyebrow">Teaching plan</p>
+              <h2 className="display-font mt-1 text-2xl font-bold">Add a course</h2>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{workspace.formDescription}</p>
+            </div>
+          </div>
+          {createdCourse && <div className="mb-5 flex items-start gap-3 rounded-xl bg-secondary p-4 text-sm text-secondary-foreground" data-testid="status-course-created"><Check className="mt-0.5 h-4 w-4 shrink-0" /><p><span className="font-bold">{createdCourse}</span> was added successfully.</p></div>}
+          <form className="space-y-4" onSubmit={submit}>
+            <div className="grid gap-4 sm:grid-cols-[.7fr_1.3fr]">
+              <label className="block"><span className="mb-2 block text-sm font-semibold">Course code</span><input required minLength={2} value={draft.code} onChange={(event) => setDraft({ ...draft, code: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm uppercase outline-none focus:ring-2 focus:ring-ring/30" placeholder="CSC 301" data-testid="input-course-code" /></label>
+              <label className="block"><span className="mb-2 block text-sm font-semibold">Course title</span><input required minLength={2} value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" placeholder="Data Structures & Algorithms" data-testid="input-course-title" /></label>
+            </div>
+            {!isStaff && <label className="block"><span className="mb-2 block text-sm font-semibold">Instructor</span><input required minLength={2} value={draft.instructor} onChange={(event) => setDraft({ ...draft, instructor: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" placeholder="Dr. Mary Johnson" data-testid="input-course-instructor" /></label>}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block"><span className="mb-2 block text-sm font-semibold">Credits</span><input required type="number" min={1} max={12} value={draft.credits} onChange={(event) => setDraft({ ...draft, credits: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="input-course-credits" /></label>
+              <label className="block"><span className="mb-2 block text-sm font-semibold">Room</span><input required value={draft.room} onChange={(event) => setDraft({ ...draft, room: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" placeholder="Science 204" data-testid="input-course-room" /></label>
+            </div>
+            <label className="block"><span className="mb-2 block text-sm font-semibold">Schedule</span><input required value={draft.schedule} onChange={(event) => setDraft({ ...draft, schedule: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" placeholder="Mon & Wed · 10:00 AM" data-testid="input-course-schedule" /></label>
+            <label className="block"><span className="mb-2 block text-sm font-semibold">Course color</span><select value={draft.accent} onChange={(event) => setDraft({ ...draft, accent: event.target.value as CourseDraft['accent'] })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30" data-testid="select-course-accent"><option value="blue">Blue</option><option value="gold">Gold</option><option value="purple">Purple</option><option value="green">Green</option></select></label>
+            {createCourse.error && <p className="text-sm font-medium text-destructive" data-testid="status-course-create-error">The course could not be added. Check the details and try again.</p>}
+            <button disabled={createCourse.isPending} className="focus-ring inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-60" data-testid="button-create-course">{createCourse.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><span>Add course</span><ArrowRight className="h-4 w-4" /></>}</button>
+          </form>
+        </section>
+        <section className="min-w-0" data-testid="section-staff-course-list">
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <div><p className="eyebrow">Current catalog</p><h2 className="display-font mt-1 text-2xl font-bold">{workspace.listTitle}</h2></div>
+            <span className="rounded-full bg-secondary px-3 py-1.5 text-xs font-bold text-secondary-foreground">{courses.length} courses</span>
+          </div>
+          <QueryState loading={coursesQuery.isLoading} error={!!coursesQuery.error} empty={!coursesQuery.isLoading && !coursesQuery.error && courses.length === 0} onRetry={() => void coursesQuery.refetch()} />
+          {!coursesQuery.isLoading && !coursesQuery.error && courses.length > 0 && <div className="grid gap-4 md:grid-cols-2">{courses.map((course) => <CourseCard course={course} key={course.id} onRegister={() => undefined} pending={false} />)}</div>}
+        </section>
+      </div>
+    </div>
   );
 }
 
@@ -894,6 +1079,7 @@ function LoginPage() {
             <button disabled={login.isPending} className="focus-ring flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition hover:brightness-110 disabled:opacity-60" data-testid="button-login-submit">{login.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign in <ArrowRight className="h-4 w-4" /></>}</button>
           </form>
           <Link href="/verify" className="mt-4 block text-center text-[11px] font-bold text-secondary-foreground underline-offset-4 hover:underline" data-testid="link-login-verify">Verify a document</Link>
+          <BrandCredit className="mt-5 text-center" />
         </div>
       </div>
     </div>
@@ -929,6 +1115,8 @@ function Router() {
     <Route path="/" component={LoginPage} />
     <Route path="/dashboard"><PrivateRoute><DashboardPage /></PrivateRoute></Route>
     <Route path="/courses"><PrivateRoute roles={['student']}><CoursesPage /></PrivateRoute></Route>
+    <Route path="/staff/assigned-courses"><PrivateRoute roles={['staff']}><CourseManagementPage /></PrivateRoute></Route>
+    <Route path="/admin/courses"><PrivateRoute roles={['admin', 'super_admin']}><CourseManagementPage /></PrivateRoute></Route>
     <Route path="/results"><PrivateRoute roles={['student', 'staff', 'admin', 'super_admin']}><ResultsPage /></PrivateRoute></Route>
     <Route path="/finance"><PrivateRoute roles={['student', 'admin', 'super_admin']}><FinancePage /></PrivateRoute></Route>
     <Route path="/documents"><PrivateRoute roles={['student', 'admin', 'super_admin']}><DocumentsPage /></PrivateRoute></Route>
@@ -944,6 +1132,15 @@ function Router() {
 }
 
 function App() {
+  const [preloading, setPreloading] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setPreloading(false), 15000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (preloading) return <PortalPreloader />;
+
   return <QueryClientProvider client={queryClient}><TooltipProvider><WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}><Router /></WouterRouter><Toaster /></TooltipProvider></QueryClientProvider>;
 }
 
